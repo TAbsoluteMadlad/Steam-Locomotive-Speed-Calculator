@@ -197,7 +197,7 @@
             How to Find the RPM Visually
           </h3>
           <p class="text-br-creammuted">
-            Imagine (or pull up a lineside video on your phone or computer) a steam locomotive travelling along at speed. Keep your eye fixed firmly on the <strong>big end</strong>—the large brass-bronzework bearing that links the main connecting rod to the driving wheel's crankpin.
+            Imagine (or pull up a lineside video on your phone or computer) a steam locomotive travelling along at speed. Keep your eye fixed firmly on the <strong>big end</strong>, the large brass-bronzework bearing that links the main connecting rod to the driving wheel's crankpin.
           </p>
           <p class="text-br-creammuted">
             Picture a beep sounding or a tap registered each time that big end swings around and passes its <strong>bottom-most point</strong> (bottom dead centre). Tapping along with that motion into a BPM counter yields your exact <strong>Wheel RPM</strong> (Revolutions Per Minute).
@@ -253,7 +253,6 @@
             <g transform="translate(270, 200)">
               <circle r="56" fill="#0d1813" stroke="#f7f0cf" stroke-width="2.5" />
               <circle r="51" fill="none" stroke="#64748b" stroke-width="1" />
-              <!-- Flush counterweight segment cast between spokes against inner rim -->
               <path d="M -34 -37 A 50 50 0 0 1 34 -37 L 22 -24 A 32 32 0 0 0 -22 -24 Z" fill="#1e2922" stroke="#f7f0cf" stroke-width="1.3" />
               <circle r="12" fill="#09160f" stroke="#f7f0cf" stroke-width="1.5" />
             </g>
@@ -262,7 +261,6 @@
             <g transform="translate(440, 200)">
               <circle r="56" fill="#0d1813" stroke="#f7f0cf" stroke-width="2.5" />
               <circle r="51" fill="none" stroke="#64748b" stroke-width="1" />
-              <!-- Driven Wheel: Deeper sector counterweight flush to rim -->
               <path d="M -38 -33 A 50 50 0 0 1 38 -33 L 18 -15 A 24 24 0 0 0 -18 -15 Z" fill="#1e2922" stroke="#f7f0cf" stroke-width="1.5" />
               <circle r="12" fill="#09160f" stroke="#f7f0cf" stroke-width="1.5" />
             </g>
@@ -284,11 +282,8 @@
             </g>
 
             <!-- Cylinder and Crosshead (Little End) -->
-            <!-- Cylinder Gland -->
             <rect x="65" y="175" width="16" height="42" fill="#0e1713" stroke="#f7f0cf" stroke-width="1.5" />
-            <!-- Piston Rod -->
             <line x1="81" y1="196" x2="160" y2="196" stroke="#f7f0cf" stroke-width="4.5" />
-            <!-- Slide Bars -->
             <line x1="80" y1="181" x2="255" y2="181" stroke="#94a3b8" stroke-width="2" />
             <line x1="80" y1="211" x2="255" y2="211" stroke="#94a3b8" stroke-width="2" />
             <rect x="250" y="177" width="8" height="38" fill="#334155" stroke="#f7f0cf" stroke-width="1" />
@@ -302,11 +297,8 @@
             <line x1="168" y1="196" x2="417" y2="216" stroke="#64748b" stroke-width="1" />
 
             <!-- Side Coupling Rods and Knuckle Joints -->
-            <!-- Leading Coupling Rod -->
             <polygon points="265,215 430,215 430,224 265,224" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
-            <!-- Intermediate Coupling Rod -->
             <polygon points="450,215 600,215 600,224 450,224" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
-            <!-- Trailing Coupling Rod -->
             <polygon points="620,215 780,215 780,224 620,224" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
 
             <!-- Big End Housing on Driven Axle -->
@@ -317,61 +309,46 @@
             <circle cx="270" cy="220" r="7.5" fill="#1b2e23" stroke="#f7f0cf" stroke-width="1.5" />
             <circle cx="610" cy="220" r="7.5" fill="#1b2e23" stroke="#f7f0cf" stroke-width="1.5" />
             <circle cx="780" cy="220" r="7" fill="#1b2e23" stroke="#f7f0cf" stroke-width="1.5" />
-
-            <!-- Knuckle Joint between Driving and Intermediate Rod -->
             <circle cx="632" cy="219.5" r="4.5" fill="#f7f0cf" />
 
-            <!-- Top Row Labels (Comfortably Spaced & Never Overlapping) -->
-            <!-- Leading Coupled Wheel -->
+            <!-- Top Row Labels -->
             <line x1="220" y1="105" x2="255" y2="155" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="215" y="98" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Leading coupled wheel</text>
 
-            <!-- Connecting Rod -->
             <line x1="330" y1="125" x2="310" y2="198" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="330" y="117" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Connecting rod</text>
 
-            <!-- Big End -->
             <line x1="440" y1="110" x2="440" y2="204" stroke="#f7f0cf" stroke-width="1.4" marker-end="url(#arrow)" />
             <text x="440" y="100" fill="#f7f0cf" font-size="13" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Big end</text>
 
-            <!-- Knuckle Joint -->
             <line x1="565" y1="125" x2="628" y2="213" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="560" y="117" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Knuckle joint</text>
 
-            <!-- Intermediate Driving Wheel -->
             <line x1="680" y1="65" x2="640" y2="155" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="690" y="58" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Intermediate driving wheel</text>
 
-            <!-- Trailing Coupling Rod Bearing -->
             <line x1="815" y1="115" x2="787" y2="213" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="825" y="107" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="start">Trailing coupling rod bearing</text>
 
-            <!-- Bottom Row Labels (Clear of Wheels & Tracks) -->
-            <!-- Little End -->
+            <!-- Bottom Row Labels -->
             <line x1="125" y1="240" x2="154" y2="203" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="120" y="254" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="end">Little end</text>
 
-            <!-- Front Coupling Rod Bearing -->
             <line x1="170" y1="295" x2="262" y2="224" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="165" y="310" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="end">Front coupling rod bearing</text>
 
-            <!-- Driving Wheel -->
             <line x1="440" y1="295" x2="440" y2="260" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="440" y="312" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Driving wheel</text>
 
-            <!-- Intermediate Coupling Rod -->
             <line x1="535" y1="285" x2="535" y2="229" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="535" y="302" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Intermediate coupling rod</text>
 
-            <!-- Intermediate Coupling Bearing -->
             <line x1="620" y1="330" x2="612" y2="229" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="620" y="348" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Intermediate coupling bearing</text>
 
-            <!-- Trailing Coupling Rod -->
             <line x1="710" y1="285" x2="710" y2="229" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="710" y="302" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Trailing coupling rod</text>
 
-            <!-- Trailing Coupled Wheel -->
             <line x1="820" y1="285" x2="805" y2="245" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
             <text x="825" y="302" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="start">Trailing coupled wheel</text>
           </svg>
@@ -740,6 +717,19 @@
 
     </div>
 
+    <!-- Historical Benchmark Section (Directly underneath Cadence & Timing Deck) -->
+    <section class="rounded-xl p-5 br-lined-panel space-y-2">
+      <div class="flex items-center justify-between border-b pb-2" style="border-color: color-mix(in srgb, var(--theme-secondary) 30%, transparent);">
+        <h3 class="font-bold text-br-cream text-xs uppercase tracking-wider">Historical Benchmark and Wheel Cadence</h3>
+        <span class="text-[11px] font-mono px-2 py-0.5 rounded border border-white/10 bg-black/30 text-br-creammuted">
+          333 Typical, 500 Theoretical
+        </span>
+      </div>
+      <p class="text-xs sm:text-sm text-br-creammuted leading-relaxed">
+        During regular service in the steam era, the average rotational speed of a locomotive's driving wheels at sustained express pace was usually around <strong class="text-br-cream font-mono">333 RPM</strong>. The theoretical mechanical threshold, governed by piston speed, internal steam wire-drawing through the ports, and valve cut-off limits, was considered to be around <strong class="text-br-cream font-mono">500 RPM</strong> (a barrier famously flirted with during high-speed record attempts like <em>Mallard</em>'s 126 mph run at approximately 504 RPM).
+      </p>
+    </section>
+
     <!-- Kinematic Motion Visualizer (Engineering Cross-Section) -->
     <div class="rounded-xl p-5 br-lined-panel space-y-3">
       <div class="flex flex-wrap items-center justify-between gap-3">
@@ -1087,14 +1077,12 @@
       root.style.setProperty('--theme-focus-ring', cfg.focusRing);
       root.style.setProperty('--theme-panel-shadow', cfg.panelShadow);
 
-      // Refresh cadence buttons and sound button border colors
       syncCadenceButtons();
       if (state.soundEnabled) {
         soundToggleBtn.style.borderColor = cfg.outerBorder;
         soundToggleBtn.style.backgroundColor = 'color-mix(in srgb, ' + cfg.accent + ' 25%, transparent)';
       }
       
-      // Update unit button highlight color
       setUnitMode(state.unitMode);
     }
 
@@ -1102,7 +1090,7 @@
       applyLivery(e.target.value);
     });
 
-    // --- Audio Synthesis Setup (Crisp Steam Chuff & Blast Pipe Bark) ---
+    // --- Polyphonic Audio Engine (Completely Overlapping, Free-Decaying Chuffs) ---
     let audioCtx = null;
     let masterGain = null;
     let noiseBuffer = null;
@@ -1114,7 +1102,8 @@
         masterGain.gain.setValueAtTime(state.soundVolume, audioCtx.currentTime);
         masterGain.connect(audioCtx.destination);
 
-        const bufferSize = audioCtx.sampleRate * 2;
+        // Pre-fill a 3-second looping noise buffer
+        const bufferSize = audioCtx.sampleRate * 3;
         noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
@@ -1138,74 +1127,70 @@
         initAudio();
         const now = audioCtx.currentTime;
 
-        // Calculate available time window per chuff so beats remain distinctly separated
-        const chuffsPerSec = Math.max(0.5, (state.wheelRpm / 60) * state.chuffsPerRev);
-        const timeBetweenChuffs = 1 / chuffsPerSec;
+        // Natural exponential decay envelope that is NEVER manually truncated.
+        // Even at 400+ RPM, each beat plays out its full decay and blends polyphonically.
+        const attackTime = 0.006;
+        const decayDuration = 0.28; // natural steam release and echo decay
 
-        // Blast duration stays strictly within 55% of the interval so there is silence between exhausts
-        const blastDuration = Math.max(0.045, Math.min(0.20, timeBetweenChuffs * 0.55));
-        const attackTime = 0.008;
-
-        // 1. High-velocity steam hiss (distinct crisp blast)
+        // 1. Steam hiss component (Air expulsion through blast nozzle)
         const whiteNoise = audioCtx.createBufferSource();
         whiteNoise.buffer = noiseBuffer;
 
         const noiseFilter = audioCtx.createBiquadFilter();
         noiseFilter.type = 'bandpass';
-        // Sharp acoustic sweep: high pressure steam venting through blast pipe nozzle
-        noiseFilter.frequency.setValueAtTime(1400, now);
-        noiseFilter.frequency.exponentialRampToValueAtTime(450, now + blastDuration);
-        noiseFilter.Q.setValueAtTime(2.6, now);
+        noiseFilter.frequency.setValueAtTime(1350, now);
+        noiseFilter.frequency.exponentialRampToValueAtTime(320, now + decayDuration);
+        noiseFilter.Q.setValueAtTime(2.2, now);
 
         const steamGain = audioCtx.createGain();
         steamGain.gain.setValueAtTime(0.0001, now);
-        steamGain.gain.linearRampToValueAtTime(0.52, now + attackTime);
-        steamGain.gain.exponentialRampToValueAtTime(0.0001, now + blastDuration);
+        steamGain.gain.linearRampToValueAtTime(0.48, now + attackTime);
+        steamGain.gain.exponentialRampToValueAtTime(0.0001, now + decayDuration);
 
         whiteNoise.connect(noiseFilter);
         noiseFilter.connect(steamGain);
         steamGain.connect(masterGain);
 
         whiteNoise.start(now);
-        whiteNoise.stop(now + blastDuration);
+        whiteNoise.stop(now + decayDuration + 0.05);
 
-        // 2. Smokebox resonance body (clean smokebox draught, without annoying booming mud)
+        // 2. Smokebox draught resonance
         const bodyNoise = audioCtx.createBufferSource();
         bodyNoise.buffer = noiseBuffer;
 
         const bodyFilter = audioCtx.createBiquadFilter();
         bodyFilter.type = 'lowpass';
-        bodyFilter.frequency.setValueAtTime(520, now);
-        bodyFilter.frequency.exponentialRampToValueAtTime(220, now + blastDuration * 0.75);
+        bodyFilter.frequency.setValueAtTime(540, now);
+        bodyFilter.frequency.exponentialRampToValueAtTime(180, now + (decayDuration * 0.8));
 
         const bodyGain = audioCtx.createGain();
         bodyGain.gain.setValueAtTime(0.0001, now);
-        bodyGain.gain.linearRampToValueAtTime(0.35, now + attackTime);
-        bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + blastDuration * 0.8);
+        bodyGain.gain.linearRampToValueAtTime(0.34, now + attackTime);
+        bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + (decayDuration * 0.8));
 
         bodyNoise.connect(bodyFilter);
         bodyFilter.connect(bodyGain);
         bodyGain.connect(masterGain);
 
         bodyNoise.start(now);
-        bodyNoise.stop(now + blastDuration);
+        bodyNoise.stop(now + decayDuration + 0.05);
 
-        // 3. Balanced, pleasant smokebox pressure thump (gentle, not abrasive)
+        // 3. Cylinder mechanical pressure transient thump
         const gentleThud = audioCtx.createOscillator();
         const thudGain = audioCtx.createGain();
         gentleThud.type = 'sine';
-        gentleThud.frequency.setValueAtTime(82, now);
-        gentleThud.frequency.exponentialRampToValueAtTime(42, now + (blastDuration * 0.45));
+        gentleThud.frequency.setValueAtTime(86, now);
+        gentleThud.frequency.exponentialRampToValueAtTime(36, now + 0.09);
 
         thudGain.gain.setValueAtTime(0.0001, now);
-        thudGain.gain.linearRampToValueAtTime(0.18, now + attackTime);
-        thudGain.gain.exponentialRampToValueAtTime(0.0001, now + (blastDuration * 0.5));
+        thudGain.gain.linearRampToValueAtTime(0.22, now + attackTime);
+        thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
 
         gentleThud.connect(thudGain);
         thudGain.connect(masterGain);
 
         gentleThud.start(now);
-        gentleThud.stop(now + blastDuration);
+        gentleThud.stop(now + 0.12);
 
       } catch (e) {
         console.warn(e);
@@ -1216,13 +1201,11 @@
     function updateCalculations(source = null) {
       const diameterInches = state.diameterInches;
 
-      // When speed is the master source (preset changed, direct target speed input)
       if (source === 'preset' || source === 'targetSpeed' || source === 'diameterChange') {
         if (diameterInches > 0) {
           state.wheelRpm = Math.max(0, Math.min(600, Math.round((state.speedMph * 63360) / (Math.PI * diameterInches * 60))));
         }
       } else {
-        // RPM is master source (tapping, direct RPM slider/input)
         state.speedMph = (state.wheelRpm * Math.PI * diameterInches * 60) / 63360;
       }
 
@@ -1244,7 +1227,6 @@
       const revsPerSec = rpm / 60;
       const secPerRev = revsPerSec > 0 ? (1 / revsPerSec) : 0;
 
-      // Speed Display Unit Choice
       let currentSpeedVal = 0;
       let label = 'MILES PER HOUR (MPH)';
       switch (state.speedUnit) {
@@ -1258,7 +1240,6 @@
       mainSpeedDisplay.textContent = currentSpeedVal >= 100 ? currentSpeedVal.toFixed(1) : currentSpeedVal.toFixed(2);
       mainSpeedUnitDisplay.textContent = label;
 
-      // Sync Inputs
       if (source !== 'directRpm') directRpmInput.value = rpm;
       if (source !== 'directChuff') directChuffInput.value = Math.round(chuffsPerMin);
       if (source !== 'targetSpeed') targetSpeedInput.value = currentSpeedVal.toFixed(1);
@@ -1267,7 +1248,6 @@
       displayChuffBpm.textContent = Math.round(chuffsPerMin);
       displayWheelRpmVal.textContent = rpm;
 
-      // Telemetry Cards
       statChuffSec.textContent = `${chuffsPerSec.toFixed(2)} beats/s`;
       statChuffMin.textContent = `${Math.round(chuffsPerMin)} chuffs/min`;
       statRevSec.textContent = `${revsPerSec.toFixed(2)} rev/s (Hz)`;
@@ -1277,10 +1257,8 @@
       statDistanceTurn.textContent = `${circumferenceFeet.toFixed(2)} ft`;
       statDistanceTurnM.textContent = `${circumferenceMeters.toFixed(2)} metres`;
 
-      // Canvas Label
       canvasWheelDiaText.textContent = `${diameterInches.toFixed(1)} in (${Math.round(diameterInches * 25.4)} mm)`;
 
-      // Status
       if (state.isPaused) {
         motionStateText.textContent = `Paused @ ${rpm} RPM`;
       } else {
@@ -1305,7 +1283,7 @@
     // --- Tap Engines ---
     function handleChuffTap() {
       const now = performance.now();
-      const timeout = 1500; // 1.5 seconds auto-reset timeout
+      const timeout = 1500;
 
       if (state.chuffTapTimestamps.length > 0) {
         const last = state.chuffTapTimestamps[state.chuffTapTimestamps.length - 1];
@@ -1318,7 +1296,6 @@
       const count = state.chuffTapTimestamps.length;
       chuffTapCount.textContent = `${count} tap${count > 1 ? 's' : ''}`;
 
-      // Reset timer resets history if no subsequent tap within 1.5 seconds
       if (state.chuffResetTimer) clearTimeout(state.chuffResetTimer);
       state.chuffResetTimer = setTimeout(() => {
         state.chuffTapTimestamps = [];
@@ -1342,7 +1319,7 @@
 
     function handleRpmTap() {
       const now = performance.now();
-      const timeout = 1500; // 1.5 seconds auto-reset timeout
+      const timeout = 1500;
 
       if (state.rpmTapTimestamps.length > 0) {
         const last = state.rpmTapTimestamps[state.rpmTapTimestamps.length - 1];
@@ -1355,7 +1332,6 @@
       const count = state.rpmTapTimestamps.length;
       rpmTapCount.textContent = `${count} tap${count > 1 ? 's' : ''}`;
 
-      // Reset timer resets history if no subsequent tap within 1.5 seconds
       if (state.rpmResetTimer) clearTimeout(state.rpmResetTimer);
       state.rpmResetTimer = setTimeout(() => {
         state.rpmTapTimestamps = [];
@@ -1434,11 +1410,10 @@
         presetStatsBadge.textContent = `${formatFeetInches(preset.diameter)} · ${preset.chuffs} chuffs/rev`;
         syncCadenceButtons();
         resetAllTaps();
-        updateCalculations('preset'); // Holds speed, recalculates RPM
+        updateCalculations('preset');
       }
     });
 
-    // 3-Way Unit Toggles (Ft + In, Inches, Metric)
     function setUnitMode(mode) {
       state.unitMode = mode;
       const cfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
@@ -1485,7 +1460,6 @@
     unitInchesBtn.addEventListener('click', () => setUnitMode('inches'));
     unitMetricBtn.addEventListener('click', () => setUnitMode('metric'));
 
-    // Diameter inputs
     wheelDiameterInput.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value) || 0;
       state.diameterInches = state.unitMode === 'metric' ? (val / 25.4) : val;
@@ -1522,12 +1496,10 @@
       });
     });
 
-    // Tap Buttons
     tapChuffBtn.addEventListener('click', handleChuffTap);
     tapRpmBtn.addEventListener('click', handleRpmTap);
     resetTapsBtn.addEventListener('click', resetAllTaps);
 
-    // Direct Inputs
     directRpmInput.addEventListener('input', (e) => {
       state.wheelRpm = Math.max(0, Math.min(600, parseFloat(e.target.value) || 0));
       updateCalculations('directRpm');
@@ -1591,7 +1563,6 @@
       }
     });
 
-    // Shortcuts
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       if (e.code === 'Space' || e.key === 'c' || e.key === 'C') {
@@ -1648,12 +1619,10 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      // Angular rotation
       const effectiveRpm = state.isPaused ? 0 : state.wheelRpm * state.playbackSpeed;
-      const angularSpeed = (effectiveRpm * 2 * Math.PI) / 60; // rad/sec
+      const angularSpeed = (effectiveRpm * 2 * Math.PI) / 60;
       wheelAngle = (wheelAngle + angularSpeed * dt) % (2 * Math.PI);
 
-      // Chuff pulse trigger
       if (!state.isPaused && effectiveRpm > 0) {
         const interval = (2 * Math.PI) / state.chuffsPerRev;
         const curIdx = Math.floor(wheelAngle / interval);
@@ -1664,24 +1633,19 @@
       }
       lastChuffAngle = wheelAngle;
 
-      // Layout Baseline Coordinates
       const railY = h - 35;
 
-      // Wheel sizing strictly mapped to diameter and scaled to accommodate multi-axles
       const numWheels = state.drivingWheelPairs;
       const baseWheelRadius = Math.max(38, Math.min(100, (state.diameterInches / 72) * 75));
-      // Squeeze wheel radius slightly if 4 or 5 pairs are chosen to fit within canvas cleanly
       const scaleFactor = numWheels >= 5 ? 0.75 : (numWheels === 4 ? 0.85 : 1.0);
       const wheelRadius = baseWheelRadius * scaleFactor;
       const wheelSpan = wheelRadius * 2.12;
 
-      // Cylinder Placement (Anchored to right side)
       const cylinderWidth = 85 * scaleFactor;
       const cylinderHeight = 54 * scaleFactor;
       const cylinderX = w - cylinderWidth - 25;
       const cylinderCenterY = railY - wheelRadius;
 
-      // Position driving wheel axles from rear (index 0) to front (index numWheels - 1)
       const frontAxleX = cylinderX - (wheelRadius * 2.5);
       const axles = [];
       for (let i = 0; i < numWheels; i++) {
@@ -1691,14 +1655,6 @@
         });
       }
 
-      // Driven Axle Selection:
-      // Odd numbers -> exact middle wheel:
-      //   1 pair -> index 0 (the only wheel)
-      //   3 pairs -> index 1 (middle wheel)
-      //   5 pairs -> index 2 (middle wheel)
-      // Even numbers -> further back from the middle:
-      //   2 pairs (4-4-0 / 0-4-0) -> index 0 (rear / back wheel)
-      //   4 pairs (2-8-0 / 8F) -> index 1 (wheel 2 from rear = 3rd wheel from front)
       let drivenIndex = 0;
       if (numWheels % 2 === 1) {
         drivenIndex = Math.floor(numWheels / 2);
@@ -1706,9 +1662,8 @@
         drivenIndex = (numWheels / 2) - 1;
       }
 
-      const mainAxle = axles[drivenIndex]; // Driven axle carrying the connecting rod big end
+      const mainAxle = axles[drivenIndex];
 
-      // Crankpins (Crank throw radius r)
       const crankThrow = wheelRadius * 0.38;
       const crankPins = axles.map(ax => ({
         x: ax.x + crankThrow * Math.cos(wheelAngle),
@@ -1716,11 +1671,9 @@
       }));
       const crankPinMain = crankPins[drivenIndex];
 
-      // Blast Pipe and Chimney positioning (Straight up from cylinder)
       chimneyAnchor.x = cylinderX + 24;
       chimneyAnchor.y = cylinderCenterY - wheelRadius * 1.55;
 
-      // Rigid Steel Connecting Rod Geometry spanning from driven axle to crosshead
       const rodDistanceToCylinder = (cylinderX - 22) - mainAxle.x;
       const rodLength = Math.max(crankThrow * 3.4, rodDistanceToCylinder - 70);
       const dy = cylinderCenterY - crankPinMain.y;
@@ -1730,14 +1683,11 @@
         y: cylinderCenterY
       };
 
-      // Slide Bars Geometry: FIXED STATIONARY to frame bracket and cylinder
-      // Fixed motion bracket anchored to frame; extended well past the furthest back-dead-centre reach
-      // of the crosshead so the crosshead slider never overruns or falls off the bars.
       const minCrossheadX = (mainAxle.x - crankThrow) + Math.sqrt(Math.max(0, rodLength * rodLength - crankThrow * crankThrow));
       const motionBracketX = Math.min(minCrossheadX - 35, frontAxleX + (wheelRadius * 0.2));
       const slideBarRightX = cylinderX - 18;
 
-      // 1. Draw Ballast, Sleepers & Steel Rail
+      // 1. Ballast, Sleepers & Steel Rail
       const sleeperPitch = 34;
       if (!state.isPaused && effectiveRpm > 0) {
         sleeperTrackOffset = (sleeperTrackOffset + angularSpeed * wheelRadius * dt) % sleeperPitch;
@@ -1750,7 +1700,6 @@
         ctx.fillRect(sx - sleeperTrackOffset, railY + 8, 16, 12);
       }
 
-      // Rail
       ctx.fillStyle = '#374151';
       ctx.fillRect(0, railY, w, 6);
       ctx.fillStyle = '#6b7280';
@@ -1758,13 +1707,12 @@
 
       const liveryCfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
 
-      // 2. Blast Pipe & Chimney Smokestack (Direct from Cylinder)
+      // 2. Blast Pipe & Chimney Smokestack
       chimneyAnchor.x = cylinderX + 26;
       chimneyAnchor.y = cylinderCenterY - (wheelRadius * 1.45);
       const chimneyBaseY = cylinderCenterY - (cylinderHeight / 2) - 4;
 
       ctx.save();
-      // Blast Pipe emerging straight up from cylinder
       ctx.strokeStyle = '#1d2a22';
       ctx.lineWidth = 10;
       ctx.beginPath();
@@ -1772,7 +1720,6 @@
       ctx.lineTo(chimneyAnchor.x, chimneyBaseY);
       ctx.stroke();
 
-      // Chimney Smokestack
       ctx.fillStyle = '#0a140f';
       ctx.beginPath();
       ctx.moveTo(chimneyAnchor.x - 14, chimneyBaseY);
@@ -1782,7 +1729,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // Chimney Livery Lined Detail
       if (state.livery === 'blue') {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
@@ -1801,7 +1747,6 @@
         ctx.stroke();
       }
 
-      // Chimney Polished Lip
       ctx.fillStyle = '#b87b32';
       ctx.beginPath();
       ctx.ellipse(chimneyAnchor.x, chimneyAnchor.y, 14, 4, 0, 0, Math.PI * 2);
@@ -1811,7 +1756,7 @@
       ctx.stroke();
       ctx.restore();
 
-      // 3. Steam Exhaust Particles from Chimney
+      // 3. Steam Exhaust Particles
       for (let i = steamParticles.length - 1; i >= 0; i--) {
         const p = steamParticles[i];
         p.x += p.vx;
@@ -1830,51 +1775,42 @@
         ctx.fill();
       }
 
-      // 4. Wheels (Layered underneath running gear & cylinders)
+      // 4. Wheels
       function drawWheel(axle, isMainDriven) {
         ctx.save();
         ctx.translate(axle.x, axle.y);
 
-        // Livery Centered Disc
         ctx.beginPath();
         ctx.arc(0, 0, wheelRadius, 0, Math.PI * 2);
         ctx.fillStyle = liveryCfg.wheelColor;
         ctx.fill();
 
-        // Steel Tyre Rim
         ctx.lineWidth = 5;
         ctx.strokeStyle = '#64748b';
         ctx.stroke();
 
-        // Bright Polished Outer Tread
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#e2e8f0';
         ctx.beginPath();
         ctx.arc(0, 0, wheelRadius + 2, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Rotating Spokes & Counterweight
         ctx.save();
         ctx.rotate(wheelAngle);
 
-        // Authentic British cast-steel counterweight segment (fitted flush between spokes against rim)
-        // Positioned opposite the crankpin (around PI, angles 0.72*PI to 1.28*PI)
         ctx.save();
         const startAng = Math.PI * 0.74;
         const endAng = Math.PI * 1.26;
         const outerR = wheelRadius - 5;
-        // Driven axle has a 0.75x scaled radial depth; coupled axles are half-thickness
         const innerR = isMainDriven ? (wheelRadius * 0.58) : (wheelRadius * 0.76);
 
         ctx.beginPath();
         ctx.arc(0, 0, outerR, startAng, endAng, false);
         ctx.arc(0, 0, innerR, endAng, startAng, true);
         ctx.closePath();
-        // Solid cast iron / steel plate fill
         ctx.fillStyle = liveryCfg.spokeColor;
         ctx.fill();
 
-        // Authentic recessed counterweight plate bevel border
         ctx.strokeStyle = '#050a07';
         ctx.lineWidth = 1.8;
         ctx.stroke();
@@ -1897,7 +1833,6 @@
           ctx.stroke();
         }
 
-        // Axle Hub & Lining Accent Ring
         ctx.beginPath();
         ctx.arc(0, 0, wheelRadius * 0.22, 0, Math.PI * 2);
         ctx.fillStyle = '#09160f';
@@ -1912,7 +1847,7 @@
 
       axles.forEach((ax, idx) => drawWheel(ax, idx === drivenIndex));
 
-      // 5. Side Coupling Rod (Connecting all driving wheel crankpins together)
+      // 5. Side Coupling Rod
       if (numWheels > 1) {
         ctx.strokeStyle = '#cbd5e1';
         ctx.lineWidth = 5.5;
@@ -1923,7 +1858,6 @@
         }
         ctx.stroke();
 
-        // Fluting along coupling rod
         ctx.strokeStyle = '#475569';
         ctx.lineWidth = 1.8;
         ctx.beginPath();
@@ -1932,7 +1866,6 @@
         ctx.stroke();
       }
 
-      // Bushings on all crankpins with brass/lining trim
       crankPins.forEach((pin, idx) => {
         const isMainPin = (idx === drivenIndex);
         ctx.fillStyle = isMainPin ? '#b87b32' : '#a36f2b';
@@ -1945,9 +1878,8 @@
         ctx.fill();
       });
 
-      // 6. FIXED STATIONARY SLIDE BARS & FRAME MOTION BRACKET (Layered on top of wheel)
+      // 6. Fixed Stationary Slide Bars & Motion Bracket
       ctx.save();
-      // Motion Bracket (Stationary frame support anchored firmly to locomotive bed)
       ctx.fillStyle = '#1c2420';
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 2;
@@ -1960,19 +1892,15 @@
       ctx.fill();
       ctx.stroke();
 
-      // Upper & Lower Polished Steel Slide Bars (Completely stationary)
       ctx.strokeStyle = '#94a3b8';
       ctx.lineWidth = 4;
       ctx.beginPath();
-      // Top guide bar
       ctx.moveTo(motionBracketX, cylinderCenterY - 14);
       ctx.lineTo(slideBarRightX, cylinderCenterY - 14);
-      // Bottom guide bar
       ctx.moveTo(motionBracketX, cylinderCenterY + 14);
       ctx.lineTo(slideBarRightX, cylinderCenterY + 14);
       ctx.stroke();
 
-      // Slide bar end bolting blocks
       ctx.fillStyle = '#475569';
       ctx.fillRect(motionBracketX - 3, cylinderCenterY - 17, 6, 6);
       ctx.fillRect(motionBracketX - 3, cylinderCenterY + 11, 6, 6);
@@ -1980,8 +1908,7 @@
       ctx.fillRect(slideBarRightX - 3, cylinderCenterY + 11, 6, 6);
       ctx.restore();
 
-      // 7. Piston Rod & Reciprocating Crosshead (Layered on top of slide bars and wheels)
-      // Polished Piston Rod
+      // 7. Piston Rod & Reciprocating Crosshead
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 6;
       ctx.beginPath();
@@ -1989,7 +1916,6 @@
       ctx.lineTo(cylinderX + 28, cylinderCenterY);
       ctx.stroke();
 
-      // Crosshead Slider Block (Reciprocates horizontally along stationary bars)
       ctx.save();
       ctx.fillStyle = '#cbd5e1';
       ctx.strokeStyle = '#1e293b';
@@ -1999,21 +1925,18 @@
       ctx.fill();
       ctx.stroke();
 
-      // Crosshead slipper guide grooves
       ctx.fillStyle = '#64748b';
       ctx.fillRect(crossheadPin.x - 14, cylinderCenterY - 15, 28, 4);
       ctx.fillRect(crossheadPin.x - 14, cylinderCenterY + 11, 28, 4);
       ctx.restore();
 
-      // 8. Steam Cylinder Cutaway Block (Foreground on top of wheels and frame)
+      // 8. Steam Cylinder Cutaway Block
       ctx.fillStyle = liveryCfg.cylinderColor;
       ctx.beginPath();
       ctx.roundRect(cylinderX - 20, cylinderCenterY - cylinderHeight / 2, cylinderWidth, cylinderHeight, 4);
       ctx.fill();
 
-      // Dynamic Cylinder Lining based on Selected Livery
       if (state.livery === 'blue') {
-        // BR Blue: slightly thickened white lines with black spacer
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.stroke();
@@ -2030,7 +1953,6 @@
         ctx.roundRect(cylinderX - 14, cylinderCenterY - cylinderHeight / 2 + 6, cylinderWidth - 12, cylinderHeight - 12, 1.5);
         ctx.stroke();
       } else if (state.livery === 'black') {
-        // BR Black: thick white outer lining, inner vermilion red, no inner black line
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2.5;
         ctx.stroke();
@@ -2041,7 +1963,6 @@
         ctx.roundRect(cylinderX - 16, cylinderCenterY - cylinderHeight / 2 + 4, cylinderWidth - 8, cylinderHeight - 8, 2);
         ctx.stroke();
       } else if (state.livery === 'maroon') {
-        // BR Maroon: refined thinner golden borders right against a neat, thinner black band
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2.5;
         ctx.stroke();
@@ -2052,7 +1973,6 @@
         ctx.roundRect(cylinderX - 18, cylinderCenterY - cylinderHeight / 2 + 2, cylinderWidth - 4, cylinderHeight - 4, 3);
         ctx.stroke();
       } else {
-        // BR Green Default: thin orange, body space, thick black, body space, thin orange
         ctx.strokeStyle = '#e86227';
         ctx.lineWidth = 1;
         ctx.stroke();
@@ -2070,12 +1990,11 @@
         ctx.stroke();
       }
 
-      // Cylinder Front & Back Flanges
       ctx.fillStyle = '#0f1712';
       ctx.fillRect(cylinderX + cylinderWidth - 25, cylinderCenterY - cylinderHeight / 2 + 2, 8, cylinderHeight - 4);
       ctx.fillRect(cylinderX - 20, cylinderCenterY - cylinderHeight / 2 + 2, 6, cylinderHeight - 4);
 
-      // 9. Rigid Steel Connecting Rod (Main Crankpin to Crosshead)
+      // 9. Rigid Steel Connecting Rod
       ctx.strokeStyle = 'rgba(0,0,0,0.5)';
       ctx.lineWidth = 7;
       ctx.beginPath();
@@ -2083,7 +2002,6 @@
       ctx.lineTo(crossheadPin.x + 2, crossheadPin.y + 2);
       ctx.stroke();
 
-      // Main fluted connecting rod
       ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = 6.5;
       ctx.beginPath();
@@ -2091,7 +2009,6 @@
       ctx.lineTo(crossheadPin.x, crossheadPin.y);
       ctx.stroke();
 
-      // Fluted central channel
       ctx.strokeStyle = '#475569';
       ctx.lineWidth = 2.2;
       ctx.beginPath();
@@ -2099,7 +2016,6 @@
       ctx.lineTo(crossheadPin.x - 10, crossheadPin.y);
       ctx.stroke();
 
-      // Crosshead gudgeon pin & brass washer
       ctx.fillStyle = '#a36f2b';
       ctx.beginPath();
       ctx.arc(crossheadPin.x, crossheadPin.y, 5, 0, Math.PI * 2);
