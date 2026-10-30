@@ -1517,8 +1517,10 @@
       };
 
       // Slide Bars Geometry: FIXED STATIONARY to frame bracket and cylinder
-      // Fixed motion bracket anchored to frame to cleanly clear crosshead travel
-      const motionBracketX = Math.min(frontAxleX + (wheelRadius * 0.4), crossheadPin.x - 35);
+      // Fixed motion bracket anchored to frame; extended well past the furthest back-dead-centre reach
+      // of the crosshead so the crosshead slider never overruns or falls off the bars.
+      const minCrossheadX = (mainAxle.x - crankThrow) + Math.sqrt(Math.max(0, rodLength * rodLength - crankThrow * crankThrow));
+      const motionBracketX = Math.min(minCrossheadX - 35, frontAxleX + (wheelRadius * 0.2));
       const slideBarRightX = cylinderX - 18;
 
       // 1. Draw Ballast, Sleepers & Steel Rail
