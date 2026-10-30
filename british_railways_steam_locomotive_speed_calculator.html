@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>British Railways Steam Locomotive Speed Calculator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            br: {
+              green: '#1a432e',       // British Railways Brunswick Locomotive Green
+              darkgreen: '#112b1e',   // Deep cab shadow green
+              deepest: '#09160f',     // Deepest smokebox/underframe
+              cream: '#f7f0cf',       // BR Gill Sans Pale Cream
+              creammuted: '#d5cca7',
+              orange: '#e86227',      // Authentic BR Orange Vermilion Outer Lining
+              goldenbrown: '#a36f2b', // Golden Brown Inner Lining (No yellow)
+              brass: '#b87b32',
+              charcoal: '#121614',
+              steel: '#9aa0a6'
+            }
+          },
+          fontFamily: {
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+            sans: ['"Gill Sans"', '"Gill Sans MT"', '"Trebuchet MS"', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Dynamic Theme Variables */
+    :root {
+      --theme-body-bg: #09160f;
+      --theme-header-bg: rgba(17, 43, 30, 0.95);
+      --theme-panel-grad: linear-gradient(180deg, #183e2b 0%, #112d1f 100%);
+      --theme-panel-bg: #122c1f;
+      --theme-inner-box: #0a1711;
+      --theme-outer-border: #e86227;
+      --theme-accent: #e86227;
+      --theme-secondary: #a36f2b;
+      --theme-focus-ring: #e86227;
+      --theme-panel-shadow: inset 0 0 0 2px #183e2b, inset 0 0 0 6px #050a07, inset 0 0 0 8px #183e2b, inset 0 0 0 9px #e86227, 0 6px 20px -2px rgba(0, 0, 0, 0.7);
+    }
+
+    body {
+      background-color: var(--theme-body-bg);
+      color: #f7f0cf;
+      transition: background-color 0.25s ease;
+    }
+
+    .br-header {
+      background-color: var(--theme-header-bg);
+      border-bottom-color: var(--theme-outer-border);
+    }
+
+    .br-lined-panel {
+      background: var(--theme-panel-grad);
+      border: 1px solid var(--theme-outer-border);
+      box-shadow: var(--theme-panel-shadow);
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .br-inner-box {
+      background-color: var(--theme-inner-box);
+      border-color: color-mix(in srgb, var(--theme-secondary) 40%, transparent);
+    }
+
+    .br-input {
+      background-color: var(--theme-inner-box);
+      border-color: color-mix(in srgb, var(--theme-secondary) 50%, transparent);
+      color: #f7f0cf;
+    }
+    .br-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--theme-focus-ring);
+      border-color: var(--theme-focus-ring);
+    }
+
+    .br-badge {
+      background-color: var(--theme-inner-box);
+      border-color: var(--theme-outer-border);
+      color: #f7f0cf;
+    }
+
+    .numerals-br {
+      color: #f7f0cf;
+      text-shadow: 2px 2px 0px #050a07, 3px 3px 6px rgba(0,0,0,0.85);
+      font-family: "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif;
+    }
+
+    .tap-btn:active {
+      transform: scale(0.98);
+      filter: brightness(1.1);
+    }
+
+    input[type=range] {
+      accent-color: var(--theme-accent);
+    }
+
+    /* Cadence selector styling */
+    .cadence-active {
+      background: var(--theme-panel-bg);
+      border-color: var(--theme-accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-secondary) 60%, transparent);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Top Header Navigation -->
+  <header class="br-header border-b border-opacity-40 backdrop-blur sticky top-0 z-30 px-4 py-3 sm:px-6 shadow-md transition-colors duration-300">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3.5">
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-br-cream flex items-center gap-2">
+            British Railways Steam Locomotive Speed Calculator
+            <span class="br-badge text-xs font-mono font-medium border px-2 py-0.5 rounded">Standard Gauge</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Quick Audio, Canvas & Livery Controls -->
+      <div class="flex items-center flex-wrap gap-2.5 text-xs">
+        <!-- Livery Theme Selector -->
+        <div class="br-inner-box flex items-center gap-1.5 border px-2.5 py-1.5 rounded">
+          <label for="liverySelect" class="text-br-creammuted select-none font-bold">Livery:</label>
+          <select id="liverySelect" class="bg-transparent text-br-cream font-bold text-xs focus:outline-none cursor-pointer">
+            <option value="green" selected>BR Green</option>
+            <option value="blue">BR Blue</option>
+            <option value="black">BR Black</option>
+            <option value="maroon">BR Maroon</option>
+          </select>
+        </div>
+
+        <button id="soundToggleBtn" class="flex items-center gap-2 px-3 py-1.5 rounded border text-br-cream transition shadow-sm cursor-pointer" style="background-color: var(--theme-panel-bg); border-color: color-mix(in srgb, var(--theme-secondary) 50%, transparent);">
+          <span id="soundLabel">Sound Off</span>
+        </button>
+
+        <div class="br-inner-box flex items-center gap-1.5 border px-2.5 py-1.5 rounded">
+          <label for="chuffVolumeSlider" class="text-br-creammuted select-none">Volume:</label>
+          <input type="range" id="chuffVolumeSlider" min="0" max="1" step="0.05" value="0.7" class="w-16 sm:w-20 h-1.5 rounded cursor-pointer" title="Chuff Volume">
+          <span id="chuffVolPercent" class="text-[11px] font-mono text-br-cream w-8">70%</span>
+        </div>
+
+        <div class="br-inner-box flex items-center gap-1.5 border px-2.5 py-1.5 rounded">
+          <span class="text-br-creammuted">Playback:</span>
+          <select id="playbackSpeedSelect" class="bg-transparent text-br-cream font-mono text-xs focus:outline-none cursor-pointer">
+            <option value="1" selected>1.0x Real</option>
+            <option value="0.5">0.5x Half</option>
+            <option value="0.25">0.25x Slow</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 space-y-6">
+
+    <!-- Welcome & Origins Story Section -->
+    <section class="rounded-xl p-5 sm:p-6 br-lined-panel space-y-3">
+      <h2 class="text-base sm:text-lg font-bold text-br-cream tracking-wide flex items-center gap-2">
+        Welcome to the British Railways Steam Locomotive Speed Calculator!
+      </h2>
+      <div class="space-y-3 text-xs sm:text-sm text-br-creammuted leading-relaxed">
+        <p>
+          This tool was born out of a fun challenge back in 2023, while developing a heritage railway game on Rec Room (RIP). To make the wheel animations look completely realistic, I needed a reliable way to match wheel rotation to train speed. That sparked a simple, once-niche formula that works just as brilliantly for estimating real-world steam locomotive speeds on the tracks today as it does in simulations.
+        </p>
+        <p>
+          Rather than keeping the technique under wraps, I’ve shared it here so fellow enthusiasts, modellers, and developers can easily calculate a locomotive’s true speed in just a few quick steps.
+        </p>
+      </div>
+    </section>
+
+    <!-- Information & Guide Section: How to find Speed by Vision & Sound -->
+    <section class="rounded-xl p-5 br-lined-panel space-y-4">
+      <div class="flex items-center justify-between border-b pb-2.5" style="border-color: color-mix(in srgb, var(--theme-secondary) 30%, transparent);">
+        <h2 class="text-sm font-bold text-br-cream uppercase tracking-wider flex items-center gap-2">
+          How to Calculate Locomotive Speed & Wheel RPM
+        </h2>
+        <span class="text-[11px] text-br-creammuted font-mono">Field Guide & Engineering Principles</span>
+      </div>
+
+      <!-- Explanatory Text Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-br-cream">
+        <!-- Visual Method -->
+        <div class="br-inner-box p-4 rounded-lg border space-y-2">
+          <h3 class="font-bold text-sm text-br-cream flex items-center gap-1.5">
+            How to Find the RPM Visually
+          </h3>
+          <p class="text-br-creammuted">
+            Imagine (or pull up a lineside video on your phone or computer) a steam locomotive travelling along at speed. Keep your eye fixed firmly on the <strong>big end</strong>—the large brass-bronzework bearing that links the main connecting rod to the driving wheel's crankpin.
+          </p>
+          <p class="text-br-creammuted">
+            Picture a beep sounding or a tap registered each time that big end swings around and passes its <strong>bottom-most point</strong> (bottom dead centre). Tapping along with that motion into a BPM counter yields your exact <strong>Wheel RPM</strong> (Revolutions Per Minute).
+          </p>
+          <p class="text-xs font-medium pt-1" style="color: var(--theme-accent);">
+            You can do this directly below using the <strong>Tap 1 Full Wheel Rev</strong> button or the <code class="font-mono">[R]</code> key.
+          </p>
+        </div>
+
+        <!-- Sound Method -->
+        <div class="br-inner-box p-4 rounded-lg border space-y-2">
+          <h3 class="font-bold text-sm text-br-cream flex items-center gap-1.5">
+            How to Find the RPM by Sound
+          </h3>
+          <p class="text-br-creammuted">
+            Firstly, identify the locomotive class to check its cylinder layout. For instance, an <em>LMS Stanier Black Five</em> has 2 cylinders, an <em>LNER A4 Pacific</em> has 3, and a <em>GWR Castle</em> has 4.
+          </p>
+          <p class="text-br-creammuted">
+            Listen closely to the exhaust beats. Each cylinder vents steam twice per revolution (once forward, once backward), creating the engine's rhythmic chuff:
+          </p>
+          <ul class="list-disc list-inside space-y-1 text-br-creammuted pl-1">
+            <li><strong>2 or 4-Cylinder Locomotives:</strong> Produce <strong>4 chuffs per wheel revolution</strong>. You can tap every single chuff with the <em>Tap Exhaust Beat</em> button, or tap only on every 4th beat using the <em>Wheel RPM</em> button.</li>
+            <li><strong>3-Cylinder Locomotives:</strong> With 120° crank separation, they produce <strong>6 chuffs per wheel revolution</strong>. Tap each individual chuff and select <em>6 Chuffs / Rev</em>, or tap once on every 6th beat.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Inverted High-Resolution Technical Diagram (Rods & Big Ends) -->
+      <div class="br-inner-box p-4 rounded-lg border space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-br-cream uppercase tracking-wide">Rods, Bearings & Big Ends Diagram</span>
+          <span class="text-[10px] text-br-creammuted font-mono">White-on-Dark Blueprint</span>
+        </div>
+        <p class="text-[11px] text-br-creammuted">
+          Irrespective of whether Walschaerts, Stephenson, or other valve gear is used, standard rod nomenclature remains identical:
+        </p>
+
+        <!-- Inverted Vector SVG Diagram -->
+        <div class="w-full overflow-x-auto bg-[#070b09] rounded-md border p-3 border-stone-800 shadow-inner">
+          <svg viewBox="0 0 980 370" class="w-full min-w-[760px] h-auto block select-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#f7f0cf" />
+              </marker>
+            </defs>
+
+            <!-- Background & Ground Rail -->
+            <line x1="10" y1="260" x2="970" y2="260" stroke="#334155" stroke-width="3" />
+            <line x1="10" y1="262" x2="970" y2="262" stroke="#64748b" stroke-width="1.5" />
+
+            <!-- Driving Wheels (4 Coupled Axles: Leading, Driving / Big End, Intermediate, Trailing) -->
+            <!-- Wheel 1: Leading Coupled Wheel (Axle at 270, 200) -->
+            <g transform="translate(270, 200)">
+              <circle r="56" fill="#0d1813" stroke="#f7f0cf" stroke-width="2.5" />
+              <circle r="51" fill="none" stroke="#64748b" stroke-width="1" />
+              <!-- Flush counterweight segment cast between spokes against inner rim -->
+              <path d="M -34 -37 A 50 50 0 0 1 34 -37 L 22 -24 A 32 32 0 0 0 -22 -24 Z" fill="#1e2922" stroke="#f7f0cf" stroke-width="1.3" />
+              <circle r="12" fill="#09160f" stroke="#f7f0cf" stroke-width="1.5" />
+            </g>
+
+            <!-- Wheel 2: Driving Wheel (Carries Big End - Axle at 440, 200) -->
+            <g transform="translate(440, 200)">
+              <circle r="56" fill="#0d1813" stroke="#f7f0cf" stroke-width="2.5" />
+              <circle r="51" fill="none" stroke="#64748b" stroke-width="1" />
+              <!-- Driven Wheel: Deeper sector counterweight flush to rim -->
+              <path d="M -38 -33 A 50 50 0 0 1 38 -33 L 18 -15 A 24 24 0 0 0 -18 -15 Z" fill="#1e2922" stroke="#f7f0cf" stroke-width="1.5" />
+              <circle r="12" fill="#09160f" stroke="#f7f0cf" stroke-width="1.5" />
+            </g>
+
+            <!-- Wheel 3: Intermediate Driving Wheel (Axle at 610, 200) -->
+            <g transform="translate(610, 200)">
+              <circle r="56" fill="#0d1813" stroke="#f7f0cf" stroke-width="2.5" />
+              <circle r="51" fill="none" stroke="#64748b" stroke-width="1" />
+              <path d="M -34 -37 A 50 50 0 0 1 34 -37 L 22 -24 A 32 32 0 0 0 -22 -24 Z" fill="#1e2922" stroke="#f7f0cf" stroke-width="1.3" />
+              <circle r="12" fill="#09160f" stroke="#f7f0cf" stroke-width="1.5" />
+            </g>
+
+            <!-- Wheel 4: Trailing Coupled Wheel (Axle at 780, 200) -->
+            <g transform="translate(780, 200)">
+              <circle r="56" fill="#0d1813" stroke="#f7f0cf" stroke-width="2.5" />
+              <circle r="51" fill="none" stroke="#64748b" stroke-width="1" />
+              <path d="M -34 -37 A 50 50 0 0 1 34 -37 L 22 -24 A 32 32 0 0 0 -22 -24 Z" fill="#1e2922" stroke="#f7f0cf" stroke-width="1.3" />
+              <circle r="12" fill="#09160f" stroke="#f7f0cf" stroke-width="1.5" />
+            </g>
+
+            <!-- Cylinder and Crosshead (Little End) -->
+            <!-- Cylinder Gland -->
+            <rect x="65" y="175" width="16" height="42" fill="#0e1713" stroke="#f7f0cf" stroke-width="1.5" />
+            <!-- Piston Rod -->
+            <line x1="81" y1="196" x2="160" y2="196" stroke="#f7f0cf" stroke-width="4.5" />
+            <!-- Slide Bars -->
+            <line x1="80" y1="181" x2="255" y2="181" stroke="#94a3b8" stroke-width="2" />
+            <line x1="80" y1="211" x2="255" y2="211" stroke="#94a3b8" stroke-width="2" />
+            <rect x="250" y="177" width="8" height="38" fill="#334155" stroke="#f7f0cf" stroke-width="1" />
+
+            <!-- Crosshead & Gudgeon Pin (Little End) -->
+            <polygon points="145,185 178,185 178,207 145,207" fill="#1e292b" stroke="#f7f0cf" stroke-width="1.5" />
+            <rect x="156" y="191" width="8" height="9" fill="#f7f0cf" />
+
+            <!-- Connecting Rod (Little End to Big End) -->
+            <polygon points="160,193 427,210 427,222 160,199" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
+            <line x1="168" y1="196" x2="417" y2="216" stroke="#64748b" stroke-width="1" />
+
+            <!-- Side Coupling Rods and Knuckle Joints -->
+            <!-- Leading Coupling Rod -->
+            <polygon points="265,215 430,215 430,224 265,224" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
+            <!-- Intermediate Coupling Rod -->
+            <polygon points="450,215 600,215 600,224 450,224" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
+            <!-- Trailing Coupling Rod -->
+            <polygon points="620,215 780,215 780,224 620,224" fill="#0f1713" stroke="#f7f0cf" stroke-width="1.6" />
+
+            <!-- Big End Housing on Driven Axle -->
+            <circle cx="440" cy="220" r="14" fill="#1b2e23" stroke="#f7f0cf" stroke-width="2" />
+            <rect x="435" y="215" width="10" height="10" fill="#f7f0cf" />
+
+            <!-- Crankpin Bearings & Knuckle Joints -->
+            <circle cx="270" cy="220" r="7.5" fill="#1b2e23" stroke="#f7f0cf" stroke-width="1.5" />
+            <circle cx="610" cy="220" r="7.5" fill="#1b2e23" stroke="#f7f0cf" stroke-width="1.5" />
+            <circle cx="780" cy="220" r="7" fill="#1b2e23" stroke="#f7f0cf" stroke-width="1.5" />
+
+            <!-- Knuckle Joint between Driving and Intermediate Rod -->
+            <circle cx="632" cy="219.5" r="4.5" fill="#f7f0cf" />
+
+            <!-- Top Row Labels (Comfortably Spaced & Never Overlapping) -->
+            <!-- Leading Coupled Wheel -->
+            <line x1="220" y1="105" x2="255" y2="155" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="215" y="98" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Leading coupled wheel</text>
+
+            <!-- Connecting Rod -->
+            <line x1="330" y1="125" x2="310" y2="198" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="330" y="117" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Connecting rod</text>
+
+            <!-- Big End -->
+            <line x1="440" y1="110" x2="440" y2="204" stroke="#f7f0cf" stroke-width="1.4" marker-end="url(#arrow)" />
+            <text x="440" y="100" fill="#f7f0cf" font-size="13" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Big end</text>
+
+            <!-- Knuckle Joint -->
+            <line x1="565" y1="125" x2="628" y2="213" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="560" y="117" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Knuckle joint</text>
+
+            <!-- Intermediate Driving Wheel -->
+            <line x1="680" y1="65" x2="640" y2="155" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="690" y="58" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Intermediate driving wheel</text>
+
+            <!-- Trailing Coupling Rod Bearing -->
+            <line x1="815" y1="115" x2="787" y2="213" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="825" y="107" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="start">Trailing coupling rod bearing</text>
+
+            <!-- Bottom Row Labels (Clear of Wheels & Tracks) -->
+            <!-- Little End -->
+            <line x1="125" y1="240" x2="154" y2="203" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="120" y="254" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="end">Little end</text>
+
+            <!-- Front Coupling Rod Bearing -->
+            <line x1="170" y1="295" x2="262" y2="224" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="165" y="310" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="end">Front coupling rod bearing</text>
+
+            <!-- Driving Wheel -->
+            <line x1="440" y1="295" x2="440" y2="260" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="440" y="312" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Driving wheel</text>
+
+            <!-- Intermediate Coupling Rod -->
+            <line x1="535" y1="285" x2="535" y2="229" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="535" y="302" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Intermediate coupling rod</text>
+
+            <!-- Intermediate Coupling Bearing -->
+            <line x1="620" y1="330" x2="612" y2="229" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="620" y="348" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Intermediate coupling bearing</text>
+
+            <!-- Trailing Coupling Rod -->
+            <line x1="710" y1="285" x2="710" y2="229" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="710" y="302" fill="#f7f0cf" font-size="11" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="middle">Trailing coupling rod</text>
+
+            <!-- Trailing Coupled Wheel -->
+            <line x1="820" y1="285" x2="805" y2="245" stroke="#f7f0cf" stroke-width="1.2" marker-end="url(#arrow)" />
+            <text x="825" y="302" fill="#f7f0cf" font-size="12" font-family="'Gill Sans', sans-serif" font-weight="bold" text-anchor="start">Trailing coupled wheel</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Row: Preset & Unit Configuration -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      
+      <!-- Preset Select (8 Cols) -->
+      <div class="md:col-span-8 rounded-xl p-4 br-lined-panel space-y-2">
+        <div class="flex items-center justify-between">
+          <label for="locoPresetSelect" class="text-xs font-bold text-br-cream uppercase tracking-wider">
+            Locomotive Class Preset (Preserved UK Standard Gauge)
+          </label>
+          <span class="text-[11px] text-br-cream font-mono font-semibold" id="presetStatsBadge">72 in (6ft 0in) · 4 chuffs/rev</span>
+        </div>
+        <select id="locoPresetSelect" class="br-input w-full border rounded-lg px-3 py-2 text-sm focus:outline-none font-medium">
+          <optgroup label="LMS & Constituents">
+            <option value="cr_812">Caledonian Railway 812 Class 0-6-0 (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="hr_jonesgoods">Highland Railway Jones Goods 4-6-0 (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lyr_23">L&YR Class 23 'Ironclad' 0-6-0 (61 in / 5ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lyr_27">L&YR Class 27 / 28 'Aspinall' 0-6-0 (61 in / 5ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lyr_pug">L&YR 'Pug' Class 21 0-4-0ST (37 in / 3ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_fairburn">LMS Fairburn 4MT 2-6-4T (69 in / 5ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_2f">LMS Fowler 2F 0-6-0 (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_3f_tender">LMS Fowler 3F 'Jinty' Tender 0-6-0 (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_jinty">LMS Fowler 3F 'Jinty' 0-6-0T (55 in / 4ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_4f">LMS Fowler 4F 0-6-0 (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_fowler_264t">LMS Fowler 4MT 2-6-4T (69 in / 5ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_crab">LMS Hughes/Fowler 'Crab' 2-6-0 (66 in / 5ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_ivatt2mt">LMS Ivatt Class 2MT 2-6-0 (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_ivatt2mt_tank">LMS Ivatt Class 2MT 2-6-2T (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_ivatt4mt">LMS Ivatt Class 4MT 'Flying Pig' 2-6-0 (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_jubilee">LMS Jubilee Class 4-6-0 (81 in / 6ft 9in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lms_patriot">LMS Patriot Class 4-6-0 (81 in / 6ft 9in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lms_princessroyal">LMS Princess Royal Pacific (78 in / 6ft 6in) · 4-Cyl (4 chuffs/rev)</option>
+            <option value="lms_royalscot">LMS Royal Scot 4-6-0 (75 in / 6ft 3in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lms_8f">LMS Stanier 8F 2-8-0 (56.5 in / 4ft 8.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_black5" selected>LMS Stanier Class 5MT 'Black Five' (72 in / 6ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_duchess">LMS Stanier Coronation / Duchess (81 in / 6ft 9in) · 4-Cyl (4 chuffs/rev)</option>
+            <option value="lms_stanier4mt">LMS Stanier 4MT 2-6-4T (69 in / 5ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lms_mogul">LMS Stanier 5MT Mogul 2-6-0 (66 in / 5ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lnwr_coaltank">LNWR Webb Coal Tank 0-6-2T (53.5 in / 4ft 5.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lnwr_superd">LNWR 'Super D' G2A 0-8-0 (51.5 in / 4ft 3.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="mr_1f">Midland Railway 1F / Half-Cab 0-6-0T (50 in / 4ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="mr_483">Midland Railway 483 Class 4-4-0 (84 in / 7ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="mr_compound">Midland Railway 1000 Class Compound (84 in / 7ft 0in) · 3-Cyl (4 chuffs/rev)</option>
+            <option value="mr_spinner">Midland Railway 115 Class 'Spinner' 4-2-2 (93.5 in / 7ft 9.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sdjr_7f">S&DJR 7F 2-8-0 (55 in / 4ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+          </optgroup>
+          <optgroup label="LNER & Constituents">
+            <option value="gnr_c1">GNR Class C1 Large Atlantic 4-4-2 (80 in / 6ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gnr_sterling">GNR Stirling Single 4-2-2 (97 in / 8ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_a1">LNER Class A1 Peppercorn / Tornado (80 in / 6ft 8in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_a2">LNER Class A2 Peppercorn / Blue Peter (74 in / 6ft 2in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_a3">LNER Class A3 / Flying Scotsman (80 in / 6ft 8in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_a4">LNER Class A4 Pacific / Mallard (80 in / 6ft 8in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_b1">LNER Class B1 Thompson (74 in / 6ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_b12">LNER Class B12 Claud Hamilton / GER S69 (78 in / 6ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_d49">LNER Class D49 Shire / Hunt (80 in / 6ft 8in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_j15">LNER Class J15 GER Y14 (57 in / 4ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_j21">LNER Class J21 NER C (57 in / 4ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_j27">LNER Class J27 NER P3 (55 in / 4ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_j36">LNER Class J36 NBR 18 (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_j52">LNER Class J52 0-6-0ST (61 in / 5ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_j72">LNER Class J72 Joem (49.5 in / 4ft 1.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_j94">LNER Class J94 Hunslet Austerity (51 in / 4ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_k1">LNER Class K1 Peppercorn Mogul (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_k4">LNER Class K4 Gresley Mogul (62 in / 5ft 2in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_o4">LNER Class O4 Robinson 2-8-0 (56 in / 4ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_q6">LNER Class Q6 NER T2 (55 in / 4ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lner_v2">LNER Class V2 Green Arrow (74 in / 6ft 2in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="lner_y7">LNER Class Y7 NER H 0-4-0T (37 in / 3ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+          </optgroup>
+          <optgroup label="GWR & Constituents">
+            <option value="gwr_cityoftruro">GWR 3700 City Class 'City of Truro' (80.5 in / 6ft 8.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_dukedog">GWR 3200 / 'Dukedog' Class (68.5 in / 5ft 8.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_1361">GWR 1361 Class 0-6-0ST (40 in / 3ft 4in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_1366">GWR 1366 Class 0-6-0PT (40 in / 3ft 4in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_1400">GWR 1400 Class Auto-Tank (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_2800">GWR 2800 / 2884 Class 2-8-0 (55.5 in / 4ft 7.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_saint">GWR 2900 Saint Class (80.5 in / 6ft 8.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_castle">GWR 4073 Castle Class (80.5 in / 6ft 8.5in) · 4-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_largeprairie">GWR 4100 / 5101 / 6100 'Large Prairie' (68 in / 5ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_4200">GWR 4200 / 5205 Class 2-8-0T (55.5 in / 4ft 7.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_4300">GWR 4300 Mogul (68 in / 5ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_4500">GWR 4500 'Small Prairie' (55.5 in / 4ft 7.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_4575">GWR 4575 'Small Prairie' (55.5 in / 4ft 7.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_hall">GWR 4900 Hall Class (72 in / 6ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_5600">GWR 5600 Class 0-6-2T (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_pannier">GWR 5700 Class Pannier Tank (52 in / 4ft 4in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_king">GWR 6000 King Class (78 in / 6ft 6in) · 4-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_6400">GWR 6400 Class Auto-Pannier (56 in / 4ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_grange">GWR 6800 Grange Class (68 in / 5ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_modhall">GWR 6959 Modified Hall Class (72 in / 6ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_7200">GWR 7200 Class 2-8-2T (55.5 in / 4ft 7.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_7400">GWR 7400 Class Pannier (56 in / 4ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_manor">GWR 7800 Manor Class (68 in / 5ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="gwr_8750">GWR 8750 Class Pannier Tank (52 in / 4ft 4in) · 2-Cyl (4 chuffs/rev)</option>
+          </optgroup>
+          <optgroup label="Southern Railway & Constituents">
+            <option value="lbscr_terrier">LB&SCR A1X 'Terrier' 0-6-0T (48 in / 4ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lbscr_e4">LB&SCR E4 Class 0-6-2T (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lswr_adams">LSWR Adams Radial Tank 4-4-2T (67 in / 5ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lswr_b4">LSWR B4 Class 0-4-0T (44 in / 3ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lswr_beattie">LSWR Beattie Well Tank 0-4-4WT (66.5 in / 5ft 6.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lswr_m7">LSWR M7 Class 0-4-4T (67 in / 5ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="lswr_t9">LSWR T9 'Greyhound' 4-4-0 (79 in / 6ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="secr_c">SECR C Class 0-6-0 (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="secr_h">SECR H Class 0-4-4T (66 in / 5ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="secr_o1">SECR O1 Class 0-6-0 (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="secr_p">SECR P Class 0-6-0T (45 in / 3ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_kingarthur">SR King Arthur / N15 4-6-0 (79 in / 6ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_lordnelson">SR Lord Nelson 4-6-0 (79 in / 6ft 7in) · 4-Cyl 135-deg (4 chuffs/rev)</option>
+            <option value="sr_mn">SR Bulleid Merchant Navy (74 in / 6ft 2in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="sr_nclass">SR Maunsell N Class Mogul (66 in / 5ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_qclass">SR Maunsell Q Class 0-6-0 (61 in / 5ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_q1">SR Bulleid Q1 'Austerity' 0-6-0 (61 in / 5ft 1in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_s15">SR Maunsell S15 Class 4-6-0 (67 in / 5ft 7in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_schools">SR Schools Class 4-4-0 (79 in / 6ft 7in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="sr_uclass">SR Maunsell U Class Mogul (72 in / 6ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_usa">SR USA Class 0-6-0T / Vulcan (53 in / 4ft 5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="sr_westcountry">SR West Country / Battle of Britain (74 in / 6ft 2in) · 3-Cyl (6 chuffs/rev)</option>
+          </optgroup>
+          <optgroup label="British Railways Standard Classes">
+            <option value="br_2mt_260">BR Standard Class 2MT 2-6-0 (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_2mt_tank">BR Standard Class 2MT 2-6-2T (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_3mt_260">BR Standard Class 3MT 2-6-0 (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_3mt_tank">BR Standard Class 3MT 2-6-2T (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_4mt_260">BR Standard Class 4MT 2-6-0 (63 in / 5ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_4mt_460">BR Standard Class 4MT 4-6-0 (68 in / 5ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_4mt_tank">BR Standard Class 4MT 2-6-4T (68 in / 5ft 8in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_5mt">BR Standard Class 5MT (70 in / 5ft 10in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_6mt">BR Standard Class 6MT 'Clan' (74 in / 6ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_7mt">BR Standard Class 7MT 'Britannia' (74 in / 6ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="br_8p">BR Standard Class 8P 'Duke of Gloucester' (74 in / 6ft 2in) · 3-Cyl (6 chuffs/rev)</option>
+            <option value="br_9f">BR Standard Class 9F / Evening Star (60 in / 5ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+          </optgroup>
+          <optgroup label="Industrial, WD & Museum Pioneers">
+            <option value="ind_bagnall">Bagnall 0-4-0ST / 0-6-0ST (40 in / 3ft 4in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="ind_barclay">Barclay 0-4-0ST / 0-6-0ST (42 in / 3ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="wd_austerity">Hunslet 'Austerity' 0-6-0ST (51 in / 4ft 3in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="pioneer_ironduke">Iron Duke (Broad Gauge replica) 4-2-2 (96 in / 8ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="pioneer_locomotion">Locomotion No. 1 (Museum) 0-4-0 (48 in / 4ft 0in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="ind_mw">Manning Wardle 0-6-0ST (38 in / 3ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="ind_peckett">Peckett 0-4-0ST / 0-6-0ST (38 in / 3ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="ind_rsh">Robert Stephenson & Hawthorns (42 in / 3ft 6in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="pioneer_rocket">Stephenson's Rocket (Museum) 0-2-2 (56.5 in / 4ft 8.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="usatc_s160">USATC S160 2-8-0 (57 in / 4ft 9in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="wd_280">WD 'Longmoor' Austerity 2-8-0 (56.5 in / 4ft 8.5in) · 2-Cyl (4 chuffs/rev)</option>
+            <option value="wd_2100">WD Austerity 2-10-0 (62 in / 5ft 2in) · 2-Cyl (4 chuffs/rev)</option>
+          </optgroup>
+          <option value="custom">-- Custom Locomotive Specification --</option>
+        </select>
+      </div>
+
+      <!-- Wheel Diameter Input (4 Cols) -->
+      <div class="md:col-span-4 rounded-xl p-4 br-lined-panel space-y-2">
+        <div class="flex items-center justify-between">
+          <label id="diaLabel" for="wheelDiameterInput" class="text-xs font-bold text-br-cream uppercase tracking-wider">
+            Wheel Diameter
+          </label>
+          <div class="br-inner-box flex rounded p-0.5 border text-[10px]">
+            <button id="unitFtInBtn" class="px-2 py-0.5 rounded text-br-creammuted hover:text-white transition">Ft + In</button>
+            <button id="unitInchesBtn" class="px-2 py-0.5 rounded font-bold transition" style="background-color: var(--theme-secondary); color: #fff;">Inches</button>
+            <button id="unitMetricBtn" class="px-2 py-0.5 rounded text-br-creammuted hover:text-white transition">Metric</button>
+          </div>
+        </div>
+
+        <!-- Single Numeric Field (Inches / Metric) -->
+        <div id="singleDiaInputContainer" class="relative">
+          <input type="number" id="wheelDiameterInput" step="0.5" min="20" max="115" value="72"
+            class="br-input w-full border rounded-lg px-3 py-2 text-base font-mono focus:outline-none font-bold">
+          <span id="unitSuffix" class="absolute right-3 top-2.5 text-xs text-br-creammuted font-mono">in</span>
+        </div>
+
+        <!-- Dual Input Fields (Feet + Inches Mode) -->
+        <div id="dualDiaInputContainer" class="hidden grid-cols-2 gap-2">
+          <div class="relative">
+            <input type="number" id="wheelDiaFtInput" min="1" max="9" step="1" value="6"
+              class="br-input w-full border rounded-lg px-3 py-2 text-base font-mono focus:outline-none font-bold">
+            <span class="absolute right-3 top-2.5 text-xs text-br-creammuted font-mono">ft</span>
+          </div>
+          <div class="relative">
+            <input type="number" id="wheelDiaInInput" min="0" max="11.875" step="0.5" value="0"
+              class="br-input w-full border rounded-lg px-3 py-2 text-base font-mono focus:outline-none font-bold">
+            <span class="absolute right-3 top-2.5 text-xs text-br-creammuted font-mono">in</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 2 Big Cadence Buttons: 4 Chuffs vs 6 Chuffs Per Revolution -->
+    <div class="rounded-xl p-5 br-lined-panel space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-bold text-br-cream uppercase tracking-wider">
+          Chuffs Per Revolution (Cylinder Configuration)
+        </h2>
+        <span class="text-xs text-br-creammuted font-mono">Standard British Railways 2, 3, or 4 cylinder layout</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button data-chuffs="4" class="chuff-mode-btn cadence-active text-left p-5 rounded-xl border transition-all duration-200 cursor-pointer shadow-md">
+          <div class="cadence-title text-xl font-bold font-mono tracking-tight text-br-cream mb-1">4 Chuffs / Rev</div>
+          <div class="cadence-desc text-xs text-br-cream leading-relaxed">Standard 2 & 4 Cylinder Engines (BR Standard Classes, Black Five, Castle, King, Hall, 8F, 9F, Panniers, Tanks)</div>
+        </button>
+
+        <button data-chuffs="6" class="chuff-mode-btn text-left p-5 rounded-xl border transition-all duration-200 cursor-pointer" style="background-color: var(--theme-inner-box); border-color: color-mix(in srgb, var(--theme-secondary) 30%, transparent);">
+          <div class="cadence-title text-xl font-bold font-mono tracking-tight text-br-creammuted mb-1">6 Chuffs / Rev</div>
+          <div class="cadence-desc text-xs text-br-creammuted leading-relaxed">3-Cylinder Engines (LNER A4 Pacific, A3 Flying Scotsman, SR Merchant Navy, Schools, Royal Scot)</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Middle Row: Interactive Tap Deck & Speed Readout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: The Dual Tap Deck (Chuff BPM vs Wheel RPM) (7 Cols) -->
+      <div class="lg:col-span-7 rounded-xl p-5 br-lined-panel space-y-5">
+        
+        <!-- Header -->
+        <div class="border-b pb-3" style="border-color: color-mix(in srgb, var(--theme-secondary) 30%, transparent);">
+          <h2 class="text-sm font-bold text-br-cream">Cadence & Timing Deck</h2>
+          <p class="text-xs text-br-creammuted">Tap either individual exhaust chuffs or full wheel revolutions</p>
+        </div>
+
+        <!-- The Two Tap Buttons Side-by-Side -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- Tap 1: TAP CHUFF (BPM) -->
+          <div class="br-inner-box p-4 rounded-xl border flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-br-cream uppercase tracking-wider">Tap Chuff (BPM)</span>
+              <span id="chuffTapCount" class="text-[11px] font-mono text-br-creammuted">0 taps</span>
+            </div>
+
+            <div class="text-center py-1">
+              <div id="displayChuffBpm" class="text-3xl font-mono font-bold numerals-br">480</div>
+              <div class="text-[11px] text-br-creammuted uppercase">Chuffs per Minute</div>
+            </div>
+
+            <button id="tapChuffBtn" class="tap-btn w-full py-3.5 px-4 rounded-lg bg-br-cream hover:bg-white text-br-deepest font-bold text-sm shadow-md flex items-center justify-center select-none cursor-pointer transition border" style="border-color: var(--theme-outer-border);">
+              TAP EXHAUST BEAT
+            </button>
+            <div class="text-center text-[10px] text-br-creammuted">Shortcut: Press [Space] or [C]</div>
+          </div>
+
+          <!-- Tap 2: TAP WHEEL RPM -->
+          <div class="br-inner-box p-4 rounded-xl border flex flex-col justify-between space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-br-creammuted uppercase tracking-wider">Tap Wheel (RPM)</span>
+              <span id="rpmTapCount" class="text-[11px] font-mono text-br-creammuted">0 taps</span>
+            </div>
+
+            <div class="text-center py-1">
+              <div id="displayWheelRpmVal" class="text-3xl font-mono font-bold numerals-br">120</div>
+              <div class="text-[11px] text-br-creammuted uppercase">Revolutions per Minute</div>
+            </div>
+
+            <button id="tapRpmBtn" class="tap-btn w-full py-3.5 px-4 rounded-lg bg-br-creammuted hover:bg-white text-br-deepest font-bold text-sm shadow-md flex items-center justify-center select-none cursor-pointer transition border" style="border-color: var(--theme-outer-border);">
+              TAP 1 FULL WHEEL REV
+            </button>
+            <div class="text-center text-[10px] text-br-creammuted">Shortcut: Press [R]</div>
+          </div>
+
+        </div>
+
+        <!-- Manual Direct Inputs -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+          <div>
+            <label for="directRpmInput" class="block font-semibold text-br-creammuted mb-1">Direct Wheel RPM</label>
+            <input type="number" id="directRpmInput" min="0" max="600" step="1" value="120"
+              class="br-input w-full border rounded-lg px-3 py-1.5 font-mono focus:outline-none">
+          </div>
+
+          <div>
+            <label for="directChuffInput" class="block font-semibold text-br-creammuted mb-1">Direct Chuff CPM / BPM</label>
+            <input type="number" id="directChuffInput" min="0" max="2400" step="1" value="480"
+              class="br-input w-full border rounded-lg px-3 py-1.5 font-mono focus:outline-none">
+          </div>
+
+          <div>
+            <label for="targetSpeedInput" class="block font-semibold text-br-creammuted mb-1">Target Speed (Sets RPM)</label>
+            <input type="number" id="targetSpeedInput" min="0" max="140" step="0.5" value="25.7"
+              class="br-input w-full border rounded-lg px-3 py-1.5 font-mono focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Wheel RPM Range Slider -->
+        <div class="space-y-1">
+          <div class="flex justify-between text-[11px] text-br-creammuted font-mono">
+            <span>0 RPM (Stationary)</span>
+            <span>120 RPM</span>
+            <span>240 RPM</span>
+            <span>400+ RPM</span>
+          </div>
+          <input type="range" id="wheelRpmSlider" min="0" max="420" value="120" class="w-full h-2 rounded cursor-pointer">
+        </div>
+
+        <!-- Big Red Reset Button -->
+        <div>
+          <button id="resetTapsBtn" class="w-full py-4 px-4 rounded-xl bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-bold text-sm border-2 border-red-500/80 shadow-lg tracking-wider uppercase transition duration-150 cursor-pointer">
+            RESET CALCULATION & TAP COUNTERS
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Speedometer Readout & Cadence Telemetry (5 Cols) -->
+      <div class="lg:col-span-5 rounded-xl p-6 br-lined-panel flex flex-col justify-between space-y-6">
+        
+        <div>
+          <!-- Header and Speed Unit Selector -->
+          <div class="flex items-center justify-between border-b pb-3" style="border-color: color-mix(in srgb, var(--theme-secondary) 30%, transparent);">
+            <span class="text-xs font-bold text-br-cream uppercase tracking-wider">Speed Readout</span>
+            <select id="speedUnitSelect" class="br-input border rounded px-2.5 py-1 text-xs font-bold uppercase tracking-wide focus:outline-none">
+              <option value="mph" selected>Miles / hr (mph)</option>
+              <option value="kmh">Kilometres / hr (km/h)</option>
+              <option value="ms">Metres / sec (m/s)</option>
+              <option value="fts">Feet / sec (ft/s)</option>
+              <option value="knots">Knots (kn)</option>
+            </select>
+          </div>
+
+          <!-- Giant Speed Dial Display -->
+          <div class="my-8 text-center">
+            <div id="mainSpeedDisplay" class="font-bold text-7xl sm:text-8xl numerals-br tracking-tight leading-none">
+              25.7
+            </div>
+            <div id="mainSpeedUnitDisplay" class="text-xs sm:text-sm font-bold tracking-widest text-br-cream uppercase mt-4">
+              MILES PER HOUR (MPH)
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Data Cards -->
+        <div class="grid grid-cols-2 gap-3 text-left">
+          <div class="br-inner-box p-3 rounded-lg border">
+            <div class="text-[11px] text-br-creammuted">Exhaust Rate</div>
+            <div id="statChuffSec" class="text-base font-mono font-bold text-br-cream mt-0.5">8.00 beats/s</div>
+            <div id="statChuffMin" class="text-[10px] text-br-creammuted font-mono">480 chuffs/min</div>
+          </div>
+
+          <div class="br-inner-box p-3 rounded-lg border">
+            <div class="text-[11px] text-br-creammuted">Revolutions</div>
+            <div id="statRevSec" class="text-base font-mono font-bold text-br-cream mt-0.5">2.00 rev/s (Hz)</div>
+            <div id="statSecRev" class="text-[10px] text-br-creammuted font-mono">0.50 s / revolution</div>
+          </div>
+
+          <div class="br-inner-box p-3 rounded-lg border">
+            <div class="text-[11px] text-br-creammuted">Metric Equivalent</div>
+            <div id="statKmh" class="text-sm font-mono font-bold text-br-cream mt-0.5">41.4 km/h</div>
+            <div id="statMs" class="text-[10px] text-br-creammuted font-mono">11.5 m/s</div>
+          </div>
+
+          <div class="br-inner-box p-3 rounded-lg border">
+            <div class="text-[11px] text-br-creammuted">Distance per Turn</div>
+            <div id="statDistanceTurn" class="text-sm font-mono font-bold text-br-cream mt-0.5">18.85 ft</div>
+            <div id="statDistanceTurnM" class="text-[10px] text-br-creammuted font-mono">5.75 metres</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Kinematic Motion Visualizer (Engineering Cross-Section) -->
+    <div class="rounded-xl p-5 br-lined-panel space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center flex-wrap gap-2 sm:gap-4">
+          <h2 class="text-sm sm:text-base font-bold text-br-cream">
+            Motion Kinematics Visualizer
+          </h2>
+
+          <!-- Driving Wheel Pairs Selector -->
+          <div class="br-inner-box flex items-center gap-1.5 border px-2.5 py-1 rounded text-xs">
+            <label for="wheelCountSelect" class="text-br-creammuted">Wheels:</label>
+            <select id="wheelCountSelect" class="bg-transparent text-br-cream font-mono font-bold focus:outline-none cursor-pointer">
+              <option value="1">1 Pair (Single - 4-2-2 / 0-2-2)</option>
+              <option value="2">2 Pairs (Coupled - 4-4-0 / 0-4-0)</option>
+              <option value="3" selected>3 Pairs (Six-Coupled - 4-6-2 / 0-6-0)</option>
+              <option value="4">4 Pairs (Eight-Coupled - 2-8-0 / 4-8-2)</option>
+              <option value="5">5 Pairs (Ten-Coupled - 9F 2-10-0)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs font-mono">
+          <span id="chuffBeatDot" class="inline-block w-3 h-3 rounded-full opacity-20 transition-opacity" style="background-color: var(--theme-accent);"></span>
+          <span id="motionStateText" class="text-br-cream">Running @ 120 RPM</span>
+          <button id="pauseToggleBtn" class="px-2.5 py-1 rounded border text-br-cream transition cursor-pointer" style="background-color: var(--theme-panel-bg); border-color: color-mix(in srgb, var(--theme-secondary) 50%, transparent);">
+            Pause
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Box -->
+      <div class="relative w-full h-[360px] sm:h-[400px] rounded-lg border overflow-hidden shadow-inner" style="background-color: var(--theme-body-bg); border-color: color-mix(in srgb, var(--theme-secondary) 40%, transparent);">
+        <canvas id="kinematicCanvas" class="w-full h-full block"></canvas>
+
+        <!-- Overlay Dimension Indicator -->
+        <div class="absolute top-3 left-3 border px-3 py-1.5 rounded text-xs font-mono space-y-0.5 pointer-events-none shadow" style="background-color: var(--theme-header-bg); border-color: var(--theme-outer-border);">
+          <div class="text-br-creammuted">Wheel Diameter: <span id="canvasWheelDiaText" class="text-br-cream font-bold">72 in</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script Implementation -->
+  <script>
+    // --- Complete Preserved Standard Gauge UK Locomotive Database ---
+    const LOCO_PRESETS = {
+      // LMS & Constituents (Alphabetical)
+      cr_812: { name: "Caledonian Railway 812 Class 0-6-0", diameter: 60, chuffs: 4 },
+      hr_jonesgoods: { name: "Highland Railway Jones Goods 4-6-0", diameter: 63, chuffs: 4 },
+      lyr_23: { name: "L&YR Class 23 'Ironclad' 0-6-0", diameter: 61, chuffs: 4 },
+      lyr_27: { name: "L&YR Class 27 / 28 'Aspinall' 0-6-0", diameter: 61, chuffs: 4 },
+      lyr_pug: { name: "L&YR 'Pug' Class 21 0-4-0ST", diameter: 37, chuffs: 4 },
+      lms_fairburn: { name: "LMS Fairburn 4MT 2-6-4T", diameter: 69, chuffs: 4 },
+      lms_2f: { name: "LMS Fowler 2F 0-6-0", diameter: 62, chuffs: 4 },
+      lms_3f_tender: { name: "LMS Fowler 3F 'Jinty' Tender 0-6-0", diameter: 63, chuffs: 4 },
+      lms_jinty: { name: "LMS Fowler 3F 'Jinty' 0-6-0T", diameter: 55, chuffs: 4 },
+      lms_4f: { name: "LMS Fowler 4F 0-6-0", diameter: 63, chuffs: 4 },
+      lms_fowler_264t: { name: "LMS Fowler 4MT 2-6-4T", diameter: 69, chuffs: 4 },
+      lms_crab: { name: "LMS Hughes/Fowler 'Crab'", diameter: 66, chuffs: 4 },
+      lms_ivatt2mt: { name: "LMS Ivatt Class 2MT 2-6-0", diameter: 60, chuffs: 4 },
+      lms_ivatt2mt_tank: { name: "LMS Ivatt Class 2MT 2-6-2T", diameter: 60, chuffs: 4 },
+      lms_ivatt4mt: { name: "LMS Ivatt Class 4MT 'Flying Pig' 2-6-0", diameter: 63, chuffs: 4 },
+      lms_jubilee: { name: "LMS Jubilee Class", diameter: 81, chuffs: 6 },
+      lms_patriot: { name: "LMS Patriot Class", diameter: 81, chuffs: 6 },
+      lms_princessroyal: { name: "LMS Princess Royal Pacific", diameter: 78, chuffs: 4 },
+      lms_royalscot: { name: "LMS Royal Scot", diameter: 75, chuffs: 6 },
+      lms_8f: { name: "LMS Stanier 8F 2-8-0", diameter: 56.5, chuffs: 4 },
+      lms_black5: { name: "LMS Stanier Class 5MT 'Black Five'", diameter: 72, chuffs: 4 },
+      lms_duchess: { name: "LMS Stanier Coronation / Duchess", diameter: 81, chuffs: 4 },
+      lms_stanier4mt: { name: "LMS Stanier 4MT 2-6-4T", diameter: 69, chuffs: 4 },
+      lms_mogul: { name: "LMS Stanier 5MT Mogul 2-6-0", diameter: 66, chuffs: 4 },
+      lnwr_coaltank: { name: "LNWR Webb Coal Tank 0-6-2T", diameter: 53.5, chuffs: 4 },
+      lnwr_superd: { name: "LNWR 'Super D' G2A 0-8-0", diameter: 51.5, chuffs: 4 },
+      mr_1f: { name: "Midland Railway 1F / Half-Cab 0-6-0T", diameter: 50, chuffs: 4 },
+      mr_483: { name: "Midland Railway 483 Class 4-4-0", diameter: 84, chuffs: 4 },
+      mr_compound: { name: "Midland Railway 1000 Class Compound", diameter: 84, chuffs: 4 },
+      mr_spinner: { name: "Midland Railway 115 Class 'Spinner' 4-2-2", diameter: 93.5, chuffs: 4 },
+      sdjr_7f: { name: "S&DJR 7F 2-8-0", diameter: 55, chuffs: 4 },
+
+      // LNER & Constituents (Alphabetical)
+      lner_a1: { name: "LNER Class A1 Peppercorn / Tornado", diameter: 80, chuffs: 6 },
+      lner_a2: { name: "LNER Class A2 Peppercorn / Blue Peter", diameter: 74, chuffs: 6 },
+      lner_a3: { name: "LNER Class A3 / Flying Scotsman", diameter: 80, chuffs: 6 },
+      lner_a4: { name: "LNER Class A4 Pacific / Mallard", diameter: 80, chuffs: 6 },
+      lner_b1: { name: "LNER Class B1 Thompson", diameter: 74, chuffs: 4 },
+      lner_b12: { name: "LNER Class B12 Claud Hamilton / GER S69", diameter: 78, chuffs: 4 },
+      lner_d49: { name: "LNER Class D49 Shire / Hunt", diameter: 80, chuffs: 6 },
+      gnr_sterling: { name: "GNR Stirling Single 4-2-2", diameter: 97, chuffs: 4 },
+      gnr_c1: { name: "GNR Class C1 Large Atlantic 4-4-2", diameter: 80, chuffs: 4 },
+      lner_j15: { name: "LNER Class J15 GER Y14", diameter: 57, chuffs: 4 },
+      lner_j21: { name: "LNER Class J21 NER C", diameter: 57, chuffs: 4 },
+      lner_j27: { name: "LNER Class J27 NER P3", diameter: 55, chuffs: 4 },
+      lner_j36: { name: "LNER Class J36 NBR 18", diameter: 62, chuffs: 4 },
+      lner_j52: { name: "LNER Class J52 0-6-0ST", diameter: 61, chuffs: 4 },
+      lner_j72: { name: "LNER Class J72 Joem", diameter: 49.5, chuffs: 4 },
+      lner_j94: { name: "LNER Class J94 Hunslet Austerity", diameter: 51, chuffs: 4 },
+      lner_k1: { name: "LNER Class K1 Peppercorn Mogul", diameter: 62, chuffs: 4 },
+      lner_k4: { name: "LNER Class K4 Gresley Mogul", diameter: 62, chuffs: 6 },
+      lner_o4: { name: "LNER Class O4 Robinson 2-8-0", diameter: 56, chuffs: 4 },
+      lner_q6: { name: "LNER Class Q6 NER T2", diameter: 55, chuffs: 4 },
+      lner_v2: { name: "LNER Class V2 Green Arrow", diameter: 74, chuffs: 6 },
+      lner_y7: { name: "LNER Class Y7 NER H 0-4-0T", diameter: 37, chuffs: 4 },
+
+      // GWR & Constituents (Alphabetical)
+      gwr_cityoftruro: { name: "GWR 3700 City Class 'City of Truro'", diameter: 80.5, chuffs: 4 },
+      gwr_dukedog: { name: "GWR 3200 / 'Dukedog' Class", diameter: 68.5, chuffs: 4 },
+      gwr_1361: { name: "GWR 1361 Class 0-6-0ST", diameter: 40, chuffs: 4 },
+      gwr_1366: { name: "GWR 1366 Class 0-6-0PT", diameter: 40, chuffs: 4 },
+      gwr_1400: { name: "GWR 1400 Class Auto-Tank", diameter: 62, chuffs: 4 },
+      gwr_2800: { name: "GWR 2800 / 2884 Class 2-8-0", diameter: 55.5, chuffs: 4 },
+      gwr_saint: { name: "GWR 2900 Saint Class", diameter: 80.5, chuffs: 4 },
+      gwr_castle: { name: "GWR 4073 Castle Class", diameter: 80.5, chuffs: 4 },
+      gwr_largeprairie: { name: "GWR 4100 / 5101 / 6100 'Large Prairie'", diameter: 68, chuffs: 4 },
+      gwr_4200: { name: "GWR 4200 / 5205 Class 2-8-0T", diameter: 55.5, chuffs: 4 },
+      gwr_4300: { name: "GWR 4300 Mogul", diameter: 68, chuffs: 4 },
+      gwr_4500: { name: "GWR 4500 'Small Prairie'", diameter: 55.5, chuffs: 4 },
+      gwr_4575: { name: "GWR 4575 'Small Prairie'", diameter: 55.5, chuffs: 4 },
+      gwr_hall: { name: "GWR 4900 Hall Class", diameter: 72, chuffs: 4 },
+      gwr_5600: { name: "GWR 5600 Class 0-6-2T", diameter: 62, chuffs: 4 },
+      gwr_pannier: { name: "GWR 5700 Class Pannier Tank", diameter: 52, chuffs: 4 },
+      gwr_king: { name: "GWR 6000 King Class", diameter: 78, chuffs: 4 },
+      gwr_6400: { name: "GWR 6400 Class Auto-Pannier", diameter: 56, chuffs: 4 },
+      gwr_grange: { name: "GWR 6800 Grange Class", diameter: 68, chuffs: 4 },
+      gwr_modhall: { name: "GWR 6959 Modified Hall Class", diameter: 72, chuffs: 4 },
+      gwr_7200: { name: "GWR 7200 Class 2-8-2T", diameter: 55.5, chuffs: 4 },
+      gwr_7400: { name: "GWR 7400 Class Pannier", diameter: 56, chuffs: 4 },
+      gwr_manor: { name: "GWR 7800 Manor Class", diameter: 68, chuffs: 4 },
+      gwr_8750: { name: "GWR 8750 Class Pannier Tank", diameter: 52, chuffs: 4 },
+
+      // Southern Railway & Constituents (Alphabetical)
+      lbscr_terrier: { name: "LB&SCR A1X 'Terrier' 0-6-0T", diameter: 48, chuffs: 4 },
+      lbscr_e4: { name: "LB&SCR E4 Class 0-6-2T", diameter: 60, chuffs: 4 },
+      lswr_adams: { name: "LSWR Adams Radial Tank 4-4-2T", diameter: 67, chuffs: 4 },
+      lswr_b4: { name: "LSWR B4 Class 0-4-0T", diameter: 44, chuffs: 4 },
+      lswr_beattie: { name: "LSWR Beattie Well Tank 0-4-4WT", diameter: 66.5, chuffs: 4 },
+      lswr_m7: { name: "LSWR M7 Class 0-4-4T", diameter: 67, chuffs: 4 },
+      lswr_t9: { name: "LSWR T9 'Greyhound' 4-4-0", diameter: 79, chuffs: 4 },
+      secr_c: { name: "SECR C Class 0-6-0", diameter: 62, chuffs: 4 },
+      secr_h: { name: "SECR H Class 0-4-4T", diameter: 66, chuffs: 4 },
+      secr_o1: { name: "SECR O1 Class 0-6-0", diameter: 62, chuffs: 4 },
+      secr_p: { name: "SECR P Class 0-6-0T", diameter: 45, chuffs: 4 },
+      sr_kingarthur: { name: "SR King Arthur / N15 4-6-0", diameter: 79, chuffs: 4 },
+      sr_lordnelson: { name: "SR Lord Nelson 4-6-0", diameter: 79, chuffs: 4 },
+      sr_mn: { name: "SR Bulleid Merchant Navy", diameter: 74, chuffs: 6 },
+      sr_nclass: { name: "SR Maunsell N Class Mogul", diameter: 66, chuffs: 4 },
+      sr_qclass: { name: "SR Maunsell Q Class 0-6-0", diameter: 61, chuffs: 4 },
+      sr_q1: { name: "SR Bulleid Q1 'Austerity' 0-6-0", diameter: 61, chuffs: 4 },
+      sr_s15: { name: "SR Maunsell S15 Class 4-6-0", diameter: 67, chuffs: 4 },
+      sr_schools: { name: "SR Schools Class 4-4-0", diameter: 79, chuffs: 6 },
+      sr_uclass: { name: "SR Maunsell U Class Mogul", diameter: 72, chuffs: 4 },
+      sr_usa: { name: "SR USA Class 0-6-0T / Vulcan", diameter: 53, chuffs: 4 },
+      sr_westcountry: { name: "SR West Country / Battle of Britain", diameter: 74, chuffs: 6 },
+
+      // BR Standard Classes (Alphabetical)
+      br_2mt_260: { name: "BR Standard Class 2MT 2-6-0", diameter: 60, chuffs: 4 },
+      br_2mt_tank: { name: "BR Standard Class 2MT 2-6-2T", diameter: 60, chuffs: 4 },
+      br_3mt_260: { name: "BR Standard Class 3MT 2-6-0", diameter: 63, chuffs: 4 },
+      br_3mt_tank: { name: "BR Standard Class 3MT 2-6-2T", diameter: 63, chuffs: 4 },
+      br_4mt_260: { name: "BR Standard Class 4MT 2-6-0", diameter: 63, chuffs: 4 },
+      br_4mt_460: { name: "BR Standard Class 4MT 4-6-0", diameter: 68, chuffs: 4 },
+      br_4mt_tank: { name: "BR Standard Class 4MT 2-6-4T", diameter: 68, chuffs: 4 },
+      br_5mt: { name: "BR Standard Class 5MT", diameter: 70, chuffs: 4 },
+      br_6mt: { name: "BR Standard Class 6MT 'Clan'", diameter: 74, chuffs: 4 },
+      br_7mt: { name: "BR Standard Class 7MT 'Britannia'", diameter: 74, chuffs: 4 },
+      br_8p: { name: "BR Standard Class 8P 'Duke of Gloucester'", diameter: 74, chuffs: 6 },
+      br_9f: { name: "BR Standard Class 9F / Evening Star", diameter: 60, chuffs: 4 },
+
+      // Industrial, WD & Museum Pioneers (Alphabetical)
+      ind_bagnall: { name: "Bagnall 0-4-0ST / 0-6-0ST", diameter: 40, chuffs: 4 },
+      ind_barclay: { name: "Barclay 0-4-0ST / 0-6-0ST", diameter: 42, chuffs: 4 },
+      wd_austerity: { name: "Hunslet 'Austerity' 0-6-0ST", diameter: 51, chuffs: 4 },
+      pioneer_ironduke: { name: "Iron Duke (Broad Gauge replica) 4-2-2", diameter: 96, chuffs: 4 },
+      pioneer_locomotion: { name: "Locomotion No. 1 (Museum) 0-4-0", diameter: 48, chuffs: 4 },
+      ind_mw: { name: "Manning Wardle 0-6-0ST", diameter: 38, chuffs: 4 },
+      ind_peckett: { name: "Peckett 0-4-0ST / 0-6-0ST", diameter: 38, chuffs: 4 },
+      ind_rsh: { name: "Robert Stephenson & Hawthorns", diameter: 42, chuffs: 4 },
+      pioneer_rocket: { name: "Stephenson's Rocket (Museum) 0-2-2", diameter: 56.5, chuffs: 4 },
+      usatc_s160: { name: "USATC S160 2-8-0", diameter: 57, chuffs: 4 },
+      wd_280: { name: "WD 'Longmoor' Austerity 2-8-0", diameter: 56.5, chuffs: 4 },
+      wd_2100: { name: "WD Austerity 2-10-0", diameter: 62, chuffs: 4 },
+
+      custom: { name: "Custom Locomotive", diameter: 72, chuffs: 4 }
+    };
+
+    // --- State Object ---
+    const state = {
+      livery: 'green',    // 'green', 'blue', 'black', 'maroon'
+      diameterInches: 72, // Default to standard 6ft (Black Five / Hall)
+      unitMode: 'inches',  // 'ftin', 'inches', or 'metric'
+      speedMph: 25.7,     // Preserved speed anchor across locomotive changes
+      wheelRpm: 120,
+      chuffsPerRev: 4,    // Standard 2-cylinder layout
+      drivingWheelPairs: 3, // 1 to 5 pairs
+      speedUnit: 'mph',   // mph, kmh, ms, fts, knots
+      playbackSpeed: 1.0,
+      isPaused: false,
+      soundEnabled: false,
+      soundVolume: 0.7,
+      chuffTapTimestamps: [],
+      rpmTapTimestamps: [],
+      chuffResetTimer: null,
+      rpmResetTimer: null
+    };
+
+    // --- Helper: Format inches into feet and inches ---
+    function formatFeetInches(inches) {
+      const ft = Math.floor(inches / 12);
+      const remIn = (inches % 12).toFixed(1).replace('.0', '');
+      return `${inches} in (${ft}ft ${remIn}in)`;
+    }
+
+    // --- DOM Elements ---
+    const locoPresetSelect = document.getElementById('locoPresetSelect');
+    const presetStatsBadge = document.getElementById('presetStatsBadge');
+    const wheelDiameterInput = document.getElementById('wheelDiameterInput');
+    const wheelDiaFtInput = document.getElementById('wheelDiaFtInput');
+    const wheelDiaInInput = document.getElementById('wheelDiaInInput');
+    const singleDiaInputContainer = document.getElementById('singleDiaInputContainer');
+    const dualDiaInputContainer = document.getElementById('dualDiaInputContainer');
+    const unitFtInBtn = document.getElementById('unitFtInBtn');
+    const unitInchesBtn = document.getElementById('unitInchesBtn');
+    const unitMetricBtn = document.getElementById('unitMetricBtn');
+    const diaLabel = document.getElementById('diaLabel');
+    const unitSuffix = document.getElementById('unitSuffix');
+    const chuffModeButtons = document.querySelectorAll('.chuff-mode-btn');
+
+    const tapChuffBtn = document.getElementById('tapChuffBtn');
+    const tapRpmBtn = document.getElementById('tapRpmBtn');
+    const resetTapsBtn = document.getElementById('resetTapsBtn');
+    const chuffTapCount = document.getElementById('chuffTapCount');
+    const rpmTapCount = document.getElementById('rpmTapCount');
+    const displayChuffBpm = document.getElementById('displayChuffBpm');
+    const displayWheelRpmVal = document.getElementById('displayWheelRpmVal');
+
+    const directRpmInput = document.getElementById('directRpmInput');
+    const directChuffInput = document.getElementById('directChuffInput');
+    const targetSpeedInput = document.getElementById('targetSpeedInput');
+    const wheelRpmSlider = document.getElementById('wheelRpmSlider');
+
+    const mainSpeedDisplay = document.getElementById('mainSpeedDisplay');
+    const mainSpeedUnitDisplay = document.getElementById('mainSpeedUnitDisplay');
+    const speedUnitSelect = document.getElementById('speedUnitSelect');
+
+    const statChuffSec = document.getElementById('statChuffSec');
+    const statChuffMin = document.getElementById('statChuffMin');
+    const statRevSec = document.getElementById('statRevSec');
+    const statSecRev = document.getElementById('statSecRev');
+    const statKmh = document.getElementById('statKmh');
+    const statMs = document.getElementById('statMs');
+    const statDistanceTurn = document.getElementById('statDistanceTurn');
+    const statDistanceTurnM = document.getElementById('statDistanceTurnM');
+
+    const canvas = document.getElementById('kinematicCanvas');
+    const ctx = canvas.getContext('2d');
+    const canvasWheelDiaText = document.getElementById('canvasWheelDiaText');
+    const chuffBeatDot = document.getElementById('chuffBeatDot');
+    const motionStateText = document.getElementById('motionStateText');
+    const pauseToggleBtn = document.getElementById('pauseToggleBtn');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const soundLabel = document.getElementById('soundLabel');
+    const chuffVolumeSlider = document.getElementById('chuffVolumeSlider');
+    const chuffVolPercent = document.getElementById('chuffVolPercent');
+    const playbackSpeedSelect = document.getElementById('playbackSpeedSelect');
+    const wheelCountSelect = document.getElementById('wheelCountSelect');
+    const liverySelect = document.getElementById('liverySelect');
+
+    // --- Livery Theme Engine ---
+    const LIVERY_CONFIGS = {
+      green: {
+        bodyBg: '#09160f',
+        headerBg: 'rgba(17, 43, 30, 0.95)',
+        panelGradient: 'linear-gradient(180deg, #183e2b 0%, #112d1f 100%)',
+        panelBg: '#183e2b',
+        innerBox: '#0d1f16',
+        outerBorder: '#e86227',
+        accent: '#e86227',
+        secondary: '#a36f2b',
+        focusRing: '#e86227',
+        panelShadow: 'inset 0 0 0 2px #183e2b, inset 0 0 0 6px #050a07, inset 0 0 0 8px #183e2b, inset 0 0 0 9px #e86227, 0 6px 20px -2px rgba(0, 0, 0, 0.7)',
+        wheelColor: '#1a432e',
+        spokeColor: '#10271b',
+        cylinderColor: '#1a432e'
+      },
+      blue: {
+        bodyBg: '#08111d',
+        headerBg: 'rgba(15, 29, 62, 0.95)',
+        panelGradient: 'linear-gradient(180deg, #162a56 0%, #0e1d3d 100%)',
+        panelBg: '#162a56',
+        innerBox: '#0c172e',
+        outerBorder: '#ffffff',
+        accent: '#ffffff',
+        secondary: '#4f72ad',
+        focusRing: '#ffffff',
+        panelShadow: 'inset 0 0 0 2px #162a56, inset 0 0 0 6px #050914, inset 0 0 0 8px #162a56, inset 0 0 0 10px #ffffff, 0 6px 20px -2px rgba(0, 0, 0, 0.7)',
+        wheelColor: '#162a56',
+        spokeColor: '#0a1428',
+        cylinderColor: '#162a56'
+      },
+      black: {
+        bodyBg: '#090a0b',
+        headerBg: 'rgba(18, 20, 21, 0.95)',
+        panelGradient: 'linear-gradient(180deg, #1a1c1e 0%, #111314 100%)',
+        panelBg: '#1e2124',
+        innerBox: '#121415',
+        outerBorder: '#ffffff',
+        accent: '#ffffff',
+        secondary: '#dc2626',
+        focusRing: '#ffffff',
+        panelShadow: 'inset 0 0 0 2px #1a1c1e, inset 0 0 0 4px #dc2626, inset 0 0 0 7px #1a1c1e, 0 6px 20px -2px rgba(0, 0, 0, 0.7)',
+        wheelColor: '#121415',
+        spokeColor: '#050607',
+        cylinderColor: '#161819'
+      },
+      maroon: {
+        bodyBg: '#170609',
+        headerBg: 'rgba(40, 10, 14, 0.95)',
+        panelGradient: 'linear-gradient(180deg, #45131a 0%, #290a0f 100%)',
+        panelBg: '#45131a',
+        innerBox: '#23070b',
+        outerBorder: '#caa24b',
+        accent: '#caa24b',
+        secondary: '#946d27',
+        focusRing: '#caa24b',
+        panelShadow: 'inset 0 0 0 1px #000000, inset 0 0 0 3px #caa24b, 0 6px 20px -2px rgba(0, 0, 0, 0.7)',
+        wheelColor: '#45131a',
+        spokeColor: '#200508',
+        cylinderColor: '#45131a'
+      }
+    };
+
+    function applyLivery(themeName) {
+      state.livery = themeName;
+      const cfg = LIVERY_CONFIGS[themeName] || LIVERY_CONFIGS.green;
+      const root = document.documentElement;
+
+      root.style.setProperty('--theme-body-bg', cfg.bodyBg);
+      root.style.setProperty('--theme-header-bg', cfg.headerBg);
+      root.style.setProperty('--theme-panel-grad', cfg.panelGradient);
+      root.style.setProperty('--theme-panel-bg', cfg.panelBg);
+      root.style.setProperty('--theme-inner-box', cfg.innerBox);
+      root.style.setProperty('--theme-outer-border', cfg.outerBorder);
+      root.style.setProperty('--theme-accent', cfg.accent);
+      root.style.setProperty('--theme-secondary', cfg.secondary);
+      root.style.setProperty('--theme-focus-ring', cfg.focusRing);
+      root.style.setProperty('--theme-panel-shadow', cfg.panelShadow);
+
+      // Refresh cadence buttons and sound button border colors
+      syncCadenceButtons();
+      if (state.soundEnabled) {
+        soundToggleBtn.style.borderColor = cfg.outerBorder;
+        soundToggleBtn.style.backgroundColor = 'color-mix(in srgb, ' + cfg.accent + ' 25%, transparent)';
+      }
+      
+      // Update unit button highlight color
+      setUnitMode(state.unitMode);
+    }
+
+    liverySelect.addEventListener('change', (e) => {
+      applyLivery(e.target.value);
+    });
+
+    // --- Audio Synthesis Setup (Crisp Steam Chuff & Blast Pipe Bark) ---
+    let audioCtx = null;
+    let masterGain = null;
+    let noiseBuffer = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(state.soundVolume, audioCtx.currentTime);
+        masterGain.connect(audioCtx.destination);
+
+        const bufferSize = audioCtx.sampleRate * 2;
+        noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSynthesizedChuff() {
+      chuffBeatDot.style.opacity = '1';
+      setTimeout(() => { chuffBeatDot.style.opacity = '0.2'; }, 60);
+
+      spawnSteamPuff();
+
+      if (!state.soundEnabled || state.wheelRpm <= 0) return;
+
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+
+        // Calculate available time window per chuff so beats remain distinctly separated
+        const chuffsPerSec = Math.max(0.5, (state.wheelRpm / 60) * state.chuffsPerRev);
+        const timeBetweenChuffs = 1 / chuffsPerSec;
+
+        // Blast duration stays strictly within 55% of the interval so there is silence between exhausts
+        const blastDuration = Math.max(0.045, Math.min(0.20, timeBetweenChuffs * 0.55));
+        const attackTime = 0.008;
+
+        // 1. High-velocity steam hiss (distinct crisp blast)
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        // Sharp acoustic sweep: high pressure steam venting through blast pipe nozzle
+        noiseFilter.frequency.setValueAtTime(1400, now);
+        noiseFilter.frequency.exponentialRampToValueAtTime(450, now + blastDuration);
+        noiseFilter.Q.setValueAtTime(2.6, now);
+
+        const steamGain = audioCtx.createGain();
+        steamGain.gain.setValueAtTime(0.0001, now);
+        steamGain.gain.linearRampToValueAtTime(0.52, now + attackTime);
+        steamGain.gain.exponentialRampToValueAtTime(0.0001, now + blastDuration);
+
+        whiteNoise.connect(noiseFilter);
+        noiseFilter.connect(steamGain);
+        steamGain.connect(masterGain);
+
+        whiteNoise.start(now);
+        whiteNoise.stop(now + blastDuration);
+
+        // 2. Smokebox resonance body (clean smokebox draught, without annoying booming mud)
+        const bodyNoise = audioCtx.createBufferSource();
+        bodyNoise.buffer = noiseBuffer;
+
+        const bodyFilter = audioCtx.createBiquadFilter();
+        bodyFilter.type = 'lowpass';
+        bodyFilter.frequency.setValueAtTime(520, now);
+        bodyFilter.frequency.exponentialRampToValueAtTime(220, now + blastDuration * 0.75);
+
+        const bodyGain = audioCtx.createGain();
+        bodyGain.gain.setValueAtTime(0.0001, now);
+        bodyGain.gain.linearRampToValueAtTime(0.35, now + attackTime);
+        bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + blastDuration * 0.8);
+
+        bodyNoise.connect(bodyFilter);
+        bodyFilter.connect(bodyGain);
+        bodyGain.connect(masterGain);
+
+        bodyNoise.start(now);
+        bodyNoise.stop(now + blastDuration);
+
+        // 3. Balanced, pleasant smokebox pressure thump (gentle, not abrasive)
+        const gentleThud = audioCtx.createOscillator();
+        const thudGain = audioCtx.createGain();
+        gentleThud.type = 'sine';
+        gentleThud.frequency.setValueAtTime(82, now);
+        gentleThud.frequency.exponentialRampToValueAtTime(42, now + (blastDuration * 0.45));
+
+        thudGain.gain.setValueAtTime(0.0001, now);
+        thudGain.gain.linearRampToValueAtTime(0.18, now + attackTime);
+        thudGain.gain.exponentialRampToValueAtTime(0.0001, now + (blastDuration * 0.5));
+
+        gentleThud.connect(thudGain);
+        thudGain.connect(masterGain);
+
+        gentleThud.start(now);
+        gentleThud.stop(now + blastDuration);
+
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // --- Math Calculations ---
+    function updateCalculations(source = null) {
+      const diameterInches = state.diameterInches;
+
+      // When speed is the master source (preset changed, direct target speed input)
+      if (source === 'preset' || source === 'targetSpeed' || source === 'diameterChange') {
+        if (diameterInches > 0) {
+          state.wheelRpm = Math.max(0, Math.min(600, Math.round((state.speedMph * 63360) / (Math.PI * diameterInches * 60))));
+        }
+      } else {
+        // RPM is master source (tapping, direct RPM slider/input)
+        state.speedMph = (state.wheelRpm * Math.PI * diameterInches * 60) / 63360;
+      }
+
+      const rpm = state.wheelRpm;
+      const chuffsPerRev = state.chuffsPerRev;
+      const mph = state.speedMph;
+
+      const circumferenceInches = Math.PI * diameterInches;
+      const circumferenceFeet = circumferenceInches / 12;
+      const circumferenceMeters = (diameterInches * 0.0254) * Math.PI;
+
+      const kmh = mph * 1.609344;
+      const ms = (rpm * circumferenceMeters) / 60;
+      const fts = (rpm * circumferenceFeet) / 60;
+      const knots = mph * 0.868976;
+
+      const chuffsPerMin = rpm * chuffsPerRev;
+      const chuffsPerSec = (rpm / 60) * chuffsPerRev;
+      const revsPerSec = rpm / 60;
+      const secPerRev = revsPerSec > 0 ? (1 / revsPerSec) : 0;
+
+      // Speed Display Unit Choice
+      let currentSpeedVal = 0;
+      let label = 'MILES PER HOUR (MPH)';
+      switch (state.speedUnit) {
+        case 'mph': currentSpeedVal = mph; label = 'MILES PER HOUR (MPH)'; break;
+        case 'kmh': currentSpeedVal = kmh; label = 'KILOMETRES PER HOUR (KM/H)'; break;
+        case 'ms': currentSpeedVal = ms; label = 'METRES PER SECOND (M/S)'; break;
+        case 'fts': currentSpeedVal = fts; label = 'FEET PER SECOND (FT/S)'; break;
+        case 'knots': currentSpeedVal = knots; label = 'NAUTICAL KNOTS (KN)'; break;
+      }
+
+      mainSpeedDisplay.textContent = currentSpeedVal >= 100 ? currentSpeedVal.toFixed(1) : currentSpeedVal.toFixed(2);
+      mainSpeedUnitDisplay.textContent = label;
+
+      // Sync Inputs
+      if (source !== 'directRpm') directRpmInput.value = rpm;
+      if (source !== 'directChuff') directChuffInput.value = Math.round(chuffsPerMin);
+      if (source !== 'targetSpeed') targetSpeedInput.value = currentSpeedVal.toFixed(1);
+      if (source !== 'slider') wheelRpmSlider.value = rpm;
+
+      displayChuffBpm.textContent = Math.round(chuffsPerMin);
+      displayWheelRpmVal.textContent = rpm;
+
+      // Telemetry Cards
+      statChuffSec.textContent = `${chuffsPerSec.toFixed(2)} beats/s`;
+      statChuffMin.textContent = `${Math.round(chuffsPerMin)} chuffs/min`;
+      statRevSec.textContent = `${revsPerSec.toFixed(2)} rev/s (Hz)`;
+      statSecRev.textContent = secPerRev > 0 ? `${secPerRev.toFixed(2)} s / rev` : '0.00 s';
+      statKmh.textContent = `${kmh.toFixed(1)} km/h`;
+      statMs.textContent = `${ms.toFixed(1)} m/s`;
+      statDistanceTurn.textContent = `${circumferenceFeet.toFixed(2)} ft`;
+      statDistanceTurnM.textContent = `${circumferenceMeters.toFixed(2)} metres`;
+
+      // Canvas Label
+      canvasWheelDiaText.textContent = `${diameterInches.toFixed(1)} in (${Math.round(diameterInches * 25.4)} mm)`;
+
+      // Status
+      if (state.isPaused) {
+        motionStateText.textContent = `Paused @ ${rpm} RPM`;
+      } else {
+        motionStateText.textContent = `Running @ ${rpm} RPM (${mph.toFixed(1)} MPH)`;
+      }
+    }
+
+    // --- Reverse Speed Calculation ---
+    function setRpmFromTargetSpeed(speedVal) {
+      if (state.diameterInches <= 0) return;
+
+      let mph = speedVal;
+      if (state.speedUnit === 'kmh') mph = speedVal / 1.609344;
+      else if (state.speedUnit === 'ms') mph = speedVal * 2.236936;
+      else if (state.speedUnit === 'fts') mph = (speedVal * 3600) / 5280;
+      else if (state.speedUnit === 'knots') mph = speedVal / 0.868976;
+
+      state.speedMph = Math.max(0, mph);
+      updateCalculations('targetSpeed');
+    }
+
+    // --- Tap Engines ---
+    function handleChuffTap() {
+      const now = performance.now();
+      const timeout = 1500; // 1.5 seconds auto-reset timeout
+
+      if (state.chuffTapTimestamps.length > 0) {
+        const last = state.chuffTapTimestamps[state.chuffTapTimestamps.length - 1];
+        if (now - last > timeout) state.chuffTapTimestamps = [];
+      }
+
+      state.chuffTapTimestamps.push(now);
+      if (state.chuffTapTimestamps.length > 16) state.chuffTapTimestamps.shift();
+
+      const count = state.chuffTapTimestamps.length;
+      chuffTapCount.textContent = `${count} tap${count > 1 ? 's' : ''}`;
+
+      // Reset timer resets history if no subsequent tap within 1.5 seconds
+      if (state.chuffResetTimer) clearTimeout(state.chuffResetTimer);
+      state.chuffResetTimer = setTimeout(() => {
+        state.chuffTapTimestamps = [];
+        chuffTapCount.textContent = '0 taps';
+      }, timeout);
+
+      if (count >= 2) {
+        let totalTime = 0;
+        for (let i = 1; i < count; i++) {
+          totalTime += (state.chuffTapTimestamps[i] - state.chuffTapTimestamps[i - 1]);
+        }
+        const avgIntervalMs = totalTime / (count - 1);
+        const chuffsPerMin = 60000 / avgIntervalMs;
+        const calculatedRpm = Math.max(0, Math.min(500, Math.round(chuffsPerMin / state.chuffsPerRev)));
+        state.wheelRpm = calculatedRpm;
+        updateCalculations('tapChuff');
+      }
+
+      playSynthesizedChuff();
+    }
+
+    function handleRpmTap() {
+      const now = performance.now();
+      const timeout = 1500; // 1.5 seconds auto-reset timeout
+
+      if (state.rpmTapTimestamps.length > 0) {
+        const last = state.rpmTapTimestamps[state.rpmTapTimestamps.length - 1];
+        if (now - last > timeout) state.rpmTapTimestamps = [];
+      }
+
+      state.rpmTapTimestamps.push(now);
+      if (state.rpmTapTimestamps.length > 12) state.rpmTapTimestamps.shift();
+
+      const count = state.rpmTapTimestamps.length;
+      rpmTapCount.textContent = `${count} tap${count > 1 ? 's' : ''}`;
+
+      // Reset timer resets history if no subsequent tap within 1.5 seconds
+      if (state.rpmResetTimer) clearTimeout(state.rpmResetTimer);
+      state.rpmResetTimer = setTimeout(() => {
+        state.rpmTapTimestamps = [];
+        rpmTapCount.textContent = '0 taps';
+      }, timeout);
+
+      if (count >= 2) {
+        let totalTime = 0;
+        for (let i = 1; i < count; i++) {
+          totalTime += (state.rpmTapTimestamps[i] - state.rpmTapTimestamps[i - 1]);
+        }
+        const avgIntervalMs = totalTime / (count - 1);
+        const directRpm = Math.max(0, Math.min(500, Math.round(60000 / avgIntervalMs)));
+        state.wheelRpm = directRpm;
+        updateCalculations('tapRpm');
+      }
+    }
+
+    function resetAllTaps() {
+      if (state.chuffResetTimer) clearTimeout(state.chuffResetTimer);
+      if (state.rpmResetTimer) clearTimeout(state.rpmResetTimer);
+      state.chuffTapTimestamps = [];
+      state.rpmTapTimestamps = [];
+      chuffTapCount.textContent = '0 taps';
+      rpmTapCount.textContent = '0 taps';
+    }
+
+    function syncCadenceButtons() {
+      const cfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
+      chuffModeButtons.forEach(btn => {
+        const c = parseInt(btn.dataset.chuffs, 10);
+        const title = btn.querySelector('.cadence-title');
+        const desc = btn.querySelector('.cadence-desc');
+
+        if (c === state.chuffsPerRev) {
+          btn.style.background = cfg.panelBg;
+          btn.style.borderColor = cfg.accent;
+          btn.style.boxShadow = `0 0 0 2px color-mix(in srgb, ${cfg.secondary} 60%, transparent)`;
+          if (title) title.className = 'cadence-title text-xl font-bold font-mono tracking-tight text-br-cream mb-1';
+          if (desc) desc.className = 'cadence-desc text-xs text-br-cream leading-relaxed';
+        } else {
+          btn.style.background = cfg.innerBox;
+          btn.style.borderColor = `color-mix(in srgb, ${cfg.secondary} 30%, transparent)`;
+          btn.style.boxShadow = 'none';
+          if (title) title.className = 'cadence-title text-xl font-bold font-mono tracking-tight text-br-creammuted mb-1';
+          if (desc) desc.className = 'cadence-desc text-xs text-br-creammuted leading-relaxed';
+        }
+      });
+    }
+
+    // --- Event Bindings ---
+    function syncDiameterInputsFromState() {
+      const totalInches = state.diameterInches;
+      const ft = Math.floor(totalInches / 12);
+      const remIn = parseFloat((totalInches % 12).toFixed(2));
+
+      wheelDiaFtInput.value = ft;
+      wheelDiaInInput.value = remIn;
+
+      if (state.unitMode === 'metric') {
+        wheelDiameterInput.value = Math.round(totalInches * 25.4);
+      } else {
+        wheelDiameterInput.value = parseFloat(totalInches.toFixed(2));
+      }
+    }
+
+    locoPresetSelect.addEventListener('change', (e) => {
+      const key = e.target.value;
+      const preset = LOCO_PRESETS[key];
+      if (preset) {
+        state.diameterInches = preset.diameter;
+        state.chuffsPerRev = preset.chuffs;
+
+        syncDiameterInputsFromState();
+
+        presetStatsBadge.textContent = `${formatFeetInches(preset.diameter)} · ${preset.chuffs} chuffs/rev`;
+        syncCadenceButtons();
+        resetAllTaps();
+        updateCalculations('preset'); // Holds speed, recalculates RPM
+      }
+    });
+
+    // 3-Way Unit Toggles (Ft + In, Inches, Metric)
+    function setUnitMode(mode) {
+      state.unitMode = mode;
+      const cfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
+      
+      const buttons = [
+        { btn: unitFtInBtn, id: 'ftin' },
+        { btn: unitInchesBtn, id: 'inches' },
+        { btn: unitMetricBtn, id: 'metric' }
+      ];
+
+      buttons.forEach(({ btn, id }) => {
+        if (id === mode) {
+          btn.style.backgroundColor = cfg.secondary;
+          btn.style.color = '#ffffff';
+          btn.className = 'px-2 py-0.5 rounded font-bold transition';
+        } else {
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = '#d5cca7';
+          btn.className = 'px-2 py-0.5 rounded text-br-creammuted hover:text-white transition';
+        }
+      });
+
+      if (mode === 'ftin') {
+        singleDiaInputContainer.classList.add('hidden');
+        dualDiaInputContainer.classList.remove('hidden');
+        dualDiaInputContainer.classList.add('grid');
+        diaLabel.textContent = 'Wheel Diameter (Ft + In)';
+      } else {
+        dualDiaInputContainer.classList.add('hidden');
+        dualDiaInputContainer.classList.remove('grid');
+        singleDiaInputContainer.classList.remove('hidden');
+        if (mode === 'metric') {
+          diaLabel.textContent = 'Wheel Diameter (Millimetres)';
+          unitSuffix.textContent = 'mm';
+        } else {
+          diaLabel.textContent = 'Wheel Diameter (Inches)';
+          unitSuffix.textContent = 'in';
+        }
+      }
+      syncDiameterInputsFromState();
+    }
+
+    unitFtInBtn.addEventListener('click', () => setUnitMode('ftin'));
+    unitInchesBtn.addEventListener('click', () => setUnitMode('inches'));
+    unitMetricBtn.addEventListener('click', () => setUnitMode('metric'));
+
+    // Diameter inputs
+    wheelDiameterInput.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value) || 0;
+      state.diameterInches = state.unitMode === 'metric' ? (val / 25.4) : val;
+      const ft = Math.floor(state.diameterInches / 12);
+      const remIn = parseFloat((state.diameterInches % 12).toFixed(2));
+      wheelDiaFtInput.value = ft;
+      wheelDiaInInput.value = remIn;
+
+      locoPresetSelect.value = 'custom';
+      presetStatsBadge.textContent = `${state.diameterInches.toFixed(1)} in · ${state.chuffsPerRev} chuffs/rev`;
+      updateCalculations('diameterChange');
+    });
+
+    function handleFtInChange() {
+      const ft = parseFloat(wheelDiaFtInput.value) || 0;
+      const remIn = parseFloat(wheelDiaInInput.value) || 0;
+      state.diameterInches = (ft * 12) + remIn;
+      wheelDiameterInput.value = parseFloat(state.diameterInches.toFixed(2));
+
+      locoPresetSelect.value = 'custom';
+      presetStatsBadge.textContent = `${state.diameterInches.toFixed(1)} in · ${state.chuffsPerRev} chuffs/rev`;
+      updateCalculations('diameterChange');
+    }
+
+    wheelDiaFtInput.addEventListener('input', handleFtInChange);
+    wheelDiaInInput.addEventListener('input', handleFtInChange);
+
+    chuffModeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.chuffsPerRev = parseInt(btn.dataset.chuffs, 10);
+        syncCadenceButtons();
+        resetAllTaps();
+        updateCalculations();
+      });
+    });
+
+    // Tap Buttons
+    tapChuffBtn.addEventListener('click', handleChuffTap);
+    tapRpmBtn.addEventListener('click', handleRpmTap);
+    resetTapsBtn.addEventListener('click', resetAllTaps);
+
+    // Direct Inputs
+    directRpmInput.addEventListener('input', (e) => {
+      state.wheelRpm = Math.max(0, Math.min(600, parseFloat(e.target.value) || 0));
+      updateCalculations('directRpm');
+    });
+
+    directChuffInput.addEventListener('input', (e) => {
+      const cpm = Math.max(0, parseFloat(e.target.value) || 0);
+      state.wheelRpm = Math.round(cpm / state.chuffsPerRev);
+      updateCalculations('directChuff');
+    });
+
+    targetSpeedInput.addEventListener('input', (e) => {
+      setRpmFromTargetSpeed(parseFloat(e.target.value) || 0);
+    });
+
+    wheelRpmSlider.addEventListener('input', (e) => {
+      state.wheelRpm = parseFloat(e.target.value);
+      updateCalculations('slider');
+    });
+
+    speedUnitSelect.addEventListener('change', (e) => {
+      state.speedUnit = e.target.value;
+      updateCalculations();
+    });
+
+    playbackSpeedSelect.addEventListener('change', (e) => {
+      state.playbackSpeed = parseFloat(e.target.value);
+    });
+
+    wheelCountSelect.addEventListener('change', (e) => {
+      state.drivingWheelPairs = parseInt(e.target.value, 10);
+    });
+
+    pauseToggleBtn.addEventListener('click', () => {
+      state.isPaused = !state.isPaused;
+      pauseToggleBtn.textContent = state.isPaused ? 'Resume' : 'Pause';
+      updateCalculations();
+    });
+
+    soundToggleBtn.addEventListener('click', () => {
+      initAudio();
+      state.soundEnabled = !state.soundEnabled;
+      const cfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
+      if (state.soundEnabled) {
+        soundLabel.textContent = 'Sound On';
+        soundToggleBtn.style.borderColor = cfg.outerBorder;
+        soundToggleBtn.style.backgroundColor = `color-mix(in srgb, ${cfg.accent} 25%, transparent)`;
+      } else {
+        soundLabel.textContent = 'Sound Off';
+        soundToggleBtn.style.borderColor = `color-mix(in srgb, ${cfg.secondary} 50%, transparent)`;
+        soundToggleBtn.style.backgroundColor = cfg.panelBg;
+      }
+    });
+
+    chuffVolumeSlider.addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      state.soundVolume = vol;
+      chuffVolPercent.textContent = `${Math.round(vol * 100)}%`;
+      if (masterGain && audioCtx) {
+        masterGain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      }
+    });
+
+    // Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      if (e.code === 'Space' || e.key === 'c' || e.key === 'C') {
+        e.preventDefault();
+        handleChuffTap();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        handleRpmTap();
+      }
+    });
+
+    // --- Engineering Kinematics Canvas Visualizer ---
+    let lastAnimTime = 0;
+    let wheelAngle = 0;
+    let lastChuffAngle = 0;
+    let sleeperTrackOffset = 0;
+    const steamParticles = [];
+
+    const chimneyAnchor = { x: 0, y: 0 };
+
+    function spawnSteamPuff() {
+      if (chimneyAnchor.x === 0) return;
+      for (let i = 0; i < 3; i++) {
+        steamParticles.push({
+          x: chimneyAnchor.x + (Math.random() * 6 - 3),
+          y: chimneyAnchor.y,
+          vx: -(Math.random() * 2 + 2) * (state.wheelRpm > 0 ? (state.wheelRpm / 110 + 0.5) : 0.6),
+          vy: -(Math.random() * 2 + 2.2),
+          radius: Math.random() * 5 + 6,
+          opacity: 0.65,
+          growth: Math.random() * 0.7 + 0.4
+        });
+      }
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawKinematics(timestamp) {
+      if (!lastAnimTime) lastAnimTime = timestamp;
+      const dt = (timestamp - lastAnimTime) / 1000;
+      lastAnimTime = timestamp;
+
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Angular rotation
+      const effectiveRpm = state.isPaused ? 0 : state.wheelRpm * state.playbackSpeed;
+      const angularSpeed = (effectiveRpm * 2 * Math.PI) / 60; // rad/sec
+      wheelAngle = (wheelAngle + angularSpeed * dt) % (2 * Math.PI);
+
+      // Chuff pulse trigger
+      if (!state.isPaused && effectiveRpm > 0) {
+        const interval = (2 * Math.PI) / state.chuffsPerRev;
+        const curIdx = Math.floor(wheelAngle / interval);
+        const lastIdx = Math.floor(lastChuffAngle / interval);
+        if (curIdx !== lastIdx) {
+          playSynthesizedChuff();
+        }
+      }
+      lastChuffAngle = wheelAngle;
+
+      // Layout Baseline Coordinates
+      const railY = h - 35;
+
+      // Wheel sizing strictly mapped to diameter and scaled to accommodate multi-axles
+      const numWheels = state.drivingWheelPairs;
+      const baseWheelRadius = Math.max(38, Math.min(100, (state.diameterInches / 72) * 75));
+      // Squeeze wheel radius slightly if 4 or 5 pairs are chosen to fit within canvas cleanly
+      const scaleFactor = numWheels >= 5 ? 0.75 : (numWheels === 4 ? 0.85 : 1.0);
+      const wheelRadius = baseWheelRadius * scaleFactor;
+      const wheelSpan = wheelRadius * 2.12;
+
+      // Cylinder Placement (Anchored to right side)
+      const cylinderWidth = 85 * scaleFactor;
+      const cylinderHeight = 54 * scaleFactor;
+      const cylinderX = w - cylinderWidth - 25;
+      const cylinderCenterY = railY - wheelRadius;
+
+      // Position driving wheel axles from rear (index 0) to front (index numWheels - 1)
+      const frontAxleX = cylinderX - (wheelRadius * 2.5);
+      const axles = [];
+      for (let i = 0; i < numWheels; i++) {
+        axles.push({
+          x: frontAxleX - ((numWheels - 1 - i) * wheelSpan),
+          y: cylinderCenterY
+        });
+      }
+
+      // Driven Axle Selection:
+      // Odd numbers -> exact middle wheel:
+      //   1 pair -> index 0 (the only wheel)
+      //   3 pairs -> index 1 (middle wheel)
+      //   5 pairs -> index 2 (middle wheel)
+      // Even numbers -> further back from the middle:
+      //   2 pairs (4-4-0 / 0-4-0) -> index 0 (rear / back wheel)
+      //   4 pairs (2-8-0 / 8F) -> index 1 (wheel 2 from rear = 3rd wheel from front)
+      let drivenIndex = 0;
+      if (numWheels % 2 === 1) {
+        drivenIndex = Math.floor(numWheels / 2);
+      } else {
+        drivenIndex = (numWheels / 2) - 1;
+      }
+
+      const mainAxle = axles[drivenIndex]; // Driven axle carrying the connecting rod big end
+
+      // Crankpins (Crank throw radius r)
+      const crankThrow = wheelRadius * 0.38;
+      const crankPins = axles.map(ax => ({
+        x: ax.x + crankThrow * Math.cos(wheelAngle),
+        y: ax.y + crankThrow * Math.sin(wheelAngle)
+      }));
+      const crankPinMain = crankPins[drivenIndex];
+
+      // Blast Pipe and Chimney positioning (Straight up from cylinder)
+      chimneyAnchor.x = cylinderX + 24;
+      chimneyAnchor.y = cylinderCenterY - wheelRadius * 1.55;
+
+      // Rigid Steel Connecting Rod Geometry spanning from driven axle to crosshead
+      const rodDistanceToCylinder = (cylinderX - 22) - mainAxle.x;
+      const rodLength = Math.max(crankThrow * 3.4, rodDistanceToCylinder - 70);
+      const dy = cylinderCenterY - crankPinMain.y;
+      const dxCrosshead = Math.sqrt(Math.max(0, rodLength * rodLength - dy * dy));
+      const crossheadPin = {
+        x: crankPinMain.x + dxCrosshead,
+        y: cylinderCenterY
+      };
+
+      // Slide Bars Geometry: FIXED STATIONARY to frame bracket and cylinder
+      // Fixed motion bracket anchored to frame; extended well past the furthest back-dead-centre reach
+      // of the crosshead so the crosshead slider never overruns or falls off the bars.
+      const minCrossheadX = (mainAxle.x - crankThrow) + Math.sqrt(Math.max(0, rodLength * rodLength - crankThrow * crankThrow));
+      const motionBracketX = Math.min(minCrossheadX - 35, frontAxleX + (wheelRadius * 0.2));
+      const slideBarRightX = cylinderX - 18;
+
+      // 1. Draw Ballast, Sleepers & Steel Rail
+      const sleeperPitch = 34;
+      if (!state.isPaused && effectiveRpm > 0) {
+        sleeperTrackOffset = (sleeperTrackOffset + angularSpeed * wheelRadius * dt) % sleeperPitch;
+      }
+      ctx.fillStyle = '#060d09';
+      ctx.fillRect(0, railY + 6, w, h - railY);
+
+      ctx.fillStyle = '#17221b';
+      for (let sx = -sleeperPitch; sx < w + sleeperPitch; sx += sleeperPitch) {
+        ctx.fillRect(sx - sleeperTrackOffset, railY + 8, 16, 12);
+      }
+
+      // Rail
+      ctx.fillStyle = '#374151';
+      ctx.fillRect(0, railY, w, 6);
+      ctx.fillStyle = '#6b7280';
+      ctx.fillRect(0, railY, w, 2);
+
+      const liveryCfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
+
+      // 2. Blast Pipe & Chimney Smokestack (Direct from Cylinder)
+      chimneyAnchor.x = cylinderX + 26;
+      chimneyAnchor.y = cylinderCenterY - (wheelRadius * 1.45);
+      const chimneyBaseY = cylinderCenterY - (cylinderHeight / 2) - 4;
+
+      ctx.save();
+      // Blast Pipe emerging straight up from cylinder
+      ctx.strokeStyle = '#1d2a22';
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(chimneyAnchor.x, cylinderCenterY - (cylinderHeight / 2));
+      ctx.lineTo(chimneyAnchor.x, chimneyBaseY);
+      ctx.stroke();
+
+      // Chimney Smokestack
+      ctx.fillStyle = '#0a140f';
+      ctx.beginPath();
+      ctx.moveTo(chimneyAnchor.x - 14, chimneyBaseY);
+      ctx.lineTo(chimneyAnchor.x - 11, chimneyAnchor.y);
+      ctx.lineTo(chimneyAnchor.x + 11, chimneyAnchor.y);
+      ctx.lineTo(chimneyAnchor.x + 14, chimneyBaseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Chimney Livery Lined Detail
+      if (state.livery === 'blue') {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else if (state.livery === 'black') {
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else if (state.livery === 'maroon') {
+        ctx.strokeStyle = '#caa24b';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      } else {
+        ctx.strokeStyle = '#e86227';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+
+      // Chimney Polished Lip
+      ctx.fillStyle = '#b87b32';
+      ctx.beginPath();
+      ctx.ellipse(chimneyAnchor.x, chimneyAnchor.y, 14, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Steam Exhaust Particles from Chimney
+      for (let i = steamParticles.length - 1; i >= 0; i--) {
+        const p = steamParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.radius += p.growth;
+        p.opacity -= 0.012;
+
+        if (p.opacity <= 0) {
+          steamParticles.splice(i, 1);
+          continue;
+        }
+
+        ctx.fillStyle = `rgba(247, 240, 207, ${p.opacity.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 4. Wheels (Layered underneath running gear & cylinders)
+      function drawWheel(axle, isMainDriven) {
+        ctx.save();
+        ctx.translate(axle.x, axle.y);
+
+        // Livery Centered Disc
+        ctx.beginPath();
+        ctx.arc(0, 0, wheelRadius, 0, Math.PI * 2);
+        ctx.fillStyle = liveryCfg.wheelColor;
+        ctx.fill();
+
+        // Steel Tyre Rim
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#64748b';
+        ctx.stroke();
+
+        // Bright Polished Outer Tread
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.arc(0, 0, wheelRadius + 2, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Rotating Spokes & Counterweight
+        ctx.save();
+        ctx.rotate(wheelAngle);
+
+        // Authentic British cast-steel counterweight segment (fitted flush between spokes against rim)
+        // Positioned opposite the crankpin (around PI, angles 0.72*PI to 1.28*PI)
+        ctx.save();
+        const startAng = Math.PI * 0.74;
+        const endAng = Math.PI * 1.26;
+        const outerR = wheelRadius - 5;
+        // Driven axle has a 0.75x scaled radial depth; coupled axles are half-thickness
+        const innerR = isMainDriven ? (wheelRadius * 0.58) : (wheelRadius * 0.76);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, outerR, startAng, endAng, false);
+        ctx.arc(0, 0, innerR, endAng, startAng, true);
+        ctx.closePath();
+        // Solid cast iron / steel plate fill
+        ctx.fillStyle = liveryCfg.spokeColor;
+        ctx.fill();
+
+        // Authentic recessed counterweight plate bevel border
+        ctx.strokeStyle = '#050a07';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        ctx.arc(0, 0, innerR + 1.5, startAng + 0.05, endAng - 0.05, false);
+        ctx.stroke();
+        ctx.restore();
+
+        const numSpokes = 16;
+        ctx.strokeStyle = liveryCfg.spokeColor;
+        ctx.lineWidth = 2.5;
+        for (let s = 0; s < numSpokes; s++) {
+          const a = (s * 2 * Math.PI) / numSpokes;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo((wheelRadius - 5) * Math.cos(a), (wheelRadius - 5) * Math.sin(a));
+          ctx.stroke();
+        }
+
+        // Axle Hub & Lining Accent Ring
+        ctx.beginPath();
+        ctx.arc(0, 0, wheelRadius * 0.22, 0, Math.PI * 2);
+        ctx.fillStyle = '#09160f';
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = liveryCfg.outerBorder;
+        ctx.stroke();
+
+        ctx.restore();
+        ctx.restore();
+      }
+
+      axles.forEach((ax, idx) => drawWheel(ax, idx === drivenIndex));
+
+      // 5. Side Coupling Rod (Connecting all driving wheel crankpins together)
+      if (numWheels > 1) {
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 5.5;
+        ctx.beginPath();
+        ctx.moveTo(crankPins[0].x, crankPins[0].y);
+        for (let i = 1; i < crankPins.length; i++) {
+          ctx.lineTo(crankPins[i].x, crankPins[i].y);
+        }
+        ctx.stroke();
+
+        // Fluting along coupling rod
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(crankPins[0].x + 8, crankPins[0].y);
+        ctx.lineTo(crankPins[crankPins.length - 1].x - 8, crankPins[crankPins.length - 1].y);
+        ctx.stroke();
+      }
+
+      // Bushings on all crankpins with brass/lining trim
+      crankPins.forEach((pin, idx) => {
+        const isMainPin = (idx === drivenIndex);
+        ctx.fillStyle = isMainPin ? '#b87b32' : '#a36f2b';
+        ctx.beginPath();
+        ctx.arc(pin.x, pin.y, isMainPin ? 7.5 : 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#09160f';
+        ctx.beginPath();
+        ctx.arc(pin.x, pin.y, isMainPin ? 3.4 : 2.8, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 6. FIXED STATIONARY SLIDE BARS & FRAME MOTION BRACKET (Layered on top of wheel)
+      ctx.save();
+      // Motion Bracket (Stationary frame support anchored firmly to locomotive bed)
+      ctx.fillStyle = '#1c2420';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(motionBracketX - 8, cylinderCenterY - 26);
+      ctx.lineTo(motionBracketX + 8, cylinderCenterY - 26);
+      ctx.lineTo(motionBracketX + 8, cylinderCenterY + 26);
+      ctx.lineTo(motionBracketX - 8, cylinderCenterY + 26);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Upper & Lower Polished Steel Slide Bars (Completely stationary)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      // Top guide bar
+      ctx.moveTo(motionBracketX, cylinderCenterY - 14);
+      ctx.lineTo(slideBarRightX, cylinderCenterY - 14);
+      // Bottom guide bar
+      ctx.moveTo(motionBracketX, cylinderCenterY + 14);
+      ctx.lineTo(slideBarRightX, cylinderCenterY + 14);
+      ctx.stroke();
+
+      // Slide bar end bolting blocks
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(motionBracketX - 3, cylinderCenterY - 17, 6, 6);
+      ctx.fillRect(motionBracketX - 3, cylinderCenterY + 11, 6, 6);
+      ctx.fillRect(slideBarRightX - 3, cylinderCenterY - 17, 6, 6);
+      ctx.fillRect(slideBarRightX - 3, cylinderCenterY + 11, 6, 6);
+      ctx.restore();
+
+      // 7. Piston Rod & Reciprocating Crosshead (Layered on top of slide bars and wheels)
+      // Polished Piston Rod
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(crossheadPin.x, cylinderCenterY);
+      ctx.lineTo(cylinderX + 28, cylinderCenterY);
+      ctx.stroke();
+
+      // Crosshead Slider Block (Reciprocates horizontally along stationary bars)
+      ctx.save();
+      ctx.fillStyle = '#cbd5e1';
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(crossheadPin.x - 14, cylinderCenterY - 15, 28, 30, 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Crosshead slipper guide grooves
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(crossheadPin.x - 14, cylinderCenterY - 15, 28, 4);
+      ctx.fillRect(crossheadPin.x - 14, cylinderCenterY + 11, 28, 4);
+      ctx.restore();
+
+      // 8. Steam Cylinder Cutaway Block (Foreground on top of wheels and frame)
+      ctx.fillStyle = liveryCfg.cylinderColor;
+      ctx.beginPath();
+      ctx.roundRect(cylinderX - 20, cylinderCenterY - cylinderHeight / 2, cylinderWidth, cylinderHeight, 4);
+      ctx.fill();
+
+      // Dynamic Cylinder Lining based on Selected Livery
+      if (state.livery === 'blue') {
+        // BR Blue: slightly thickened white lines with black spacer
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#050914';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(cylinderX - 17, cylinderCenterY - cylinderHeight / 2 + 3, cylinderWidth - 6, cylinderHeight - 6, 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(cylinderX - 14, cylinderCenterY - cylinderHeight / 2 + 6, cylinderWidth - 12, cylinderHeight - 12, 1.5);
+        ctx.stroke();
+      } else if (state.livery === 'black') {
+        // BR Black: thick white outer lining, inner vermilion red, no inner black line
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(cylinderX - 16, cylinderCenterY - cylinderHeight / 2 + 4, cylinderWidth - 8, cylinderHeight - 8, 2);
+        ctx.stroke();
+      } else if (state.livery === 'maroon') {
+        // BR Maroon: refined thinner golden borders right against a neat, thinner black band
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#caa24b';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(cylinderX - 18, cylinderCenterY - cylinderHeight / 2 + 2, cylinderWidth - 4, cylinderHeight - 4, 3);
+        ctx.stroke();
+      } else {
+        // BR Green Default: thin orange, body space, thick black, body space, thin orange
+        ctx.strokeStyle = '#e86227';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#050a07';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(cylinderX - 17, cylinderCenterY - cylinderHeight / 2 + 3, cylinderWidth - 6, cylinderHeight - 6, 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#e86227';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(cylinderX - 14, cylinderCenterY - cylinderHeight / 2 + 6, cylinderWidth - 12, cylinderHeight - 12, 1.5);
+        ctx.stroke();
+      }
+
+      // Cylinder Front & Back Flanges
+      ctx.fillStyle = '#0f1712';
+      ctx.fillRect(cylinderX + cylinderWidth - 25, cylinderCenterY - cylinderHeight / 2 + 2, 8, cylinderHeight - 4);
+      ctx.fillRect(cylinderX - 20, cylinderCenterY - cylinderHeight / 2 + 2, 6, cylinderHeight - 4);
+
+      // 9. Rigid Steel Connecting Rod (Main Crankpin to Crosshead)
+      ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.moveTo(crankPinMain.x + 2, crankPinMain.y + 2);
+      ctx.lineTo(crossheadPin.x + 2, crossheadPin.y + 2);
+      ctx.stroke();
+
+      // Main fluted connecting rod
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 6.5;
+      ctx.beginPath();
+      ctx.moveTo(crankPinMain.x, crankPinMain.y);
+      ctx.lineTo(crossheadPin.x, crossheadPin.y);
+      ctx.stroke();
+
+      // Fluted central channel
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(crankPinMain.x + 10, crankPinMain.y);
+      ctx.lineTo(crossheadPin.x - 10, crossheadPin.y);
+      ctx.stroke();
+
+      // Crosshead gudgeon pin & brass washer
+      ctx.fillStyle = '#a36f2b';
+      ctx.beginPath();
+      ctx.arc(crossheadPin.x, crossheadPin.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0f1712';
+      ctx.beginPath();
+      ctx.arc(crossheadPin.x, crossheadPin.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      requestAnimationFrame(drawKinematics);
+    }
+
+    // --- Startup ---
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      applyLivery('green');
+      syncCadenceButtons();
+      updateCalculations();
+      requestAnimationFrame(drawKinematics);
+    });
+  </script>
+</body>
+</html>
