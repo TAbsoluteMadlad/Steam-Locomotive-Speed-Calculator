@@ -174,7 +174,7 @@
       </h2>
       <div class="space-y-2.5 text-xs sm:text-sm text-br-creammuted leading-relaxed">
         <p>
-          This tool was born out of a game development challenge back in 2023, while developing a heritage railway game on Rec Room (RIP). To make the wheel animations match the speed of the train, I needed a reliable way to match wheel rotation to train speed. That sparked a simple, once-niche formula that works just as well for estimating real-world steam locomotive speeds on the tracks today as it does in simulations.
+          This tool was born out of a game development challenge back in 2023, while developing a heritage railway game on Rec Room(RIP). To make the wheel animations match the speed of the train, I needed a reliable way to match wheel rotation to train speed. That sparked a simple, once-niche formula that works just as well for estimating real-world steam locomotive speeds on the tracks today as it does in simulations.
         </p>
         <p>
           Rather than keeping the technique under wraps, I’ve shared it here so fellow enthusiasts, modellers, and gamers can easily calculate a locomotive’s true speed in just a few quick steps.
@@ -653,7 +653,7 @@
             <span>0 RPM</span>
             <span>120 RPM</span>
             <span>240 RPM</span>
-            <span>500+ RPM</span>
+            <span>400+ RPM</span>
           </div>
           <input type="range" id="wheelRpmSlider" min="0" max="510" value="117" class="w-full h-2 rounded cursor-pointer">
         </div>
@@ -859,7 +859,7 @@
         <span class="text-[10px] sm:text-[11px] text-br-creammuted font-mono">333 Typical · 500 Theoretical</span>
       </div>
       <p class="text-xs sm:text-sm text-br-creammuted leading-relaxed">
-        The average RPM of a steam locomotives wheels in steam days was usually seen as 333, and theoretical RPM was 500 (This is not always the case, don't expect that all locomotives can reach high speeds because of these RPM figures, as speed is based on more than just benchmarks).
+        The average rpm of a steam locomotives wheels in steam days was usually seen as 333, and theoretical rpm was 500 (This is not always the case, don't expect that most locomotives can reach high speeds because of these RPM figures).
       </p>
       <p class="text-xs sm:text-sm text-br-creammuted leading-relaxed">
         333 RPM represented sustained, efficient main-line express passenger running, while 500 RPM pushed the absolute boundary of mechanical stress (famously approached during Mallard's 1938 world record run at approximately 504 RPM).
@@ -1955,9 +1955,10 @@
 
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
     }
@@ -1965,7 +1966,7 @@
 
     function drawKinematics(timestamp) {
       if (!lastAnimTime) lastAnimTime = timestamp;
-      const dt = (timestamp - lastAnimTime) / 1000;
+      const dt = Math.min(0.1, Math.max(0, (timestamp - lastAnimTime) / 1000));
       lastAnimTime = timestamp;
 
       const rect = canvas.getBoundingClientRect();
@@ -1974,6 +1975,11 @@
 
       // Update British Railways Smiths Speedometer needle smoothly
       updateSmithsNeedle(timestamp);
+
+      if (w <= 0 || h <= 0) {
+        requestAnimationFrame(drawKinematics);
+        return;
+      }
 
       ctx.clearRect(0, 0, w, h);
 
@@ -2005,12 +2011,20 @@
 
       const wheelbaseLength = (numWheels - 1) * wheelSpan;
       const frontAxleToCylinder = wheelRadius * 2.4;
-      const totalLocoWidth = (wheelRadius * 2) + wheelbaseLength + frontAxleToCylinder + cylinderWidth;
+      const totalLocoWidth = wheelRadius + wheelbaseLength + frontAxleToCylinder + cylinderWidth - 20;
 
       // Centered X coordinate anchor
       const rearAxleX = (w - totalLocoWidth) / 2 + wheelRadius;
       const frontAxleX = rearAxleX + wheelbaseLength;
       const cylinderX = frontAxleX + frontAxleToCylinder;
+
+      // Responsive zoom factor so the entire locomotive fits cleanly on phone screens
+      const availW = Math.max(120, w - 32);
+      const zoomX = availW / Math.max(1, totalLocoWidth);
+      const locoHeightAboveRail = wheelRadius * 2.45 + 16;
+      const availH = Math.max(100, railY - 44);
+      const zoomY = availH / Math.max(1, locoHeightAboveRail);
+      const zoom = Math.max(0.28, Math.min(1.0, zoomX, zoomY));
 
       const axles = [];
       for (let i = 0; i < numWheels; i++) {
@@ -2035,8 +2049,8 @@
       }));
       const crankPinMain = crankPins[drivenIndex];
 
-      chimneyAnchor.x = cylinderX + 24;
-      chimneyAnchor.y = cylinderCenterY - wheelRadius * 1.55;
+      chimneyAnchor.x = cylinderX + 26;
+      chimneyAnchor.y = cylinderCenterY - (wheelRadius * 1.45);
 
       const rodDistanceToCylinder = (cylinderX - 22) - mainAxle.x;
       const rodLength = Math.max(crankThrow * 3.4, rodDistanceToCylinder - 70);
@@ -2051,10 +2065,10 @@
       const motionBracketX = Math.min(minCrossheadX - 35, frontAxleX + (wheelRadius * 0.2));
       const slideBarRightX = cylinderX - 18;
 
-      // 1. Draw Ballast, Sleepers & Steel Rail
+      // 1. Draw Ballast, Sleepers & Steel Rail (Unscaled full-width)
       const sleeperPitch = 34;
       if (!state.isPaused && effectiveRpm > 0) {
-        sleeperTrackOffset = (sleeperTrackOffset + angularSpeed * wheelRadius * dt) % sleeperPitch;
+        sleeperTrackOffset = (sleeperTrackOffset + angularSpeed * wheelRadius * zoom * dt) % sleeperPitch;
       }
       ctx.fillStyle = '#060d09';
       ctx.fillRect(0, railY + 6, w, h - railY);
@@ -2071,9 +2085,13 @@
 
       const liveryCfg = LIVERY_CONFIGS[state.livery] || LIVERY_CONFIGS.green;
 
+      // Uniformly scale locomotive assembly anchored at rail center (w / 2, railY)
+      ctx.save();
+      ctx.translate(w / 2, railY);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-w / 2, -railY);
+
       // 2. Blast Pipe & Chimney
-      chimneyAnchor.x = cylinderX + 26;
-      chimneyAnchor.y = cylinderCenterY - (wheelRadius * 1.45);
       const chimneyBaseY = cylinderCenterY - (cylinderHeight / 2) - 4;
 
       ctx.save();
@@ -2389,6 +2407,8 @@
       ctx.beginPath();
       ctx.arc(crossheadPin.x, crossheadPin.y, 2, 0, Math.PI * 2);
       ctx.fill();
+
+      ctx.restore();
 
       requestAnimationFrame(drawKinematics);
     }
